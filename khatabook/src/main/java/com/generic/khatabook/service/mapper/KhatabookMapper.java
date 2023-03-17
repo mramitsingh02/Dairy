@@ -3,18 +3,20 @@ package com.generic.khatabook.service.mapper;
 import com.generic.khatabook.entity.GenerationDate;
 import com.generic.khatabook.entity.Khatabook;
 import com.generic.khatabook.model.KhatabookDTO;
+import org.springframework.stereotype.Component;
 
+@Component
 public class KhatabookMapper {
 
-    public static KhatabookDTO mapToPojo(Khatabook myKhatabook) {
+    public KhatabookDTO mapToPojo(Khatabook myKhatabook) {
 
         if (myKhatabook == null) {
             return null;
         }
-        return new KhatabookDTO(myKhatabook.getBookId(), myKhatabook.getKhatabookId(), myKhatabook.getMsisdn(), myKhatabook.getPartnerName(), myKhatabook.getPartnerDescription());
+        return new KhatabookDTO(null, myKhatabook.getBookId(), myKhatabook.getKhatabookId(), myKhatabook.getMsisdn(), myKhatabook.getPartnerName(), myKhatabook.getPartnerDescription());
     }
 
-    public static Khatabook mapToDTO(KhatabookDTO myKhatabookDTO, final GenerationDate generationDate) {
+    public Khatabook mapToDTO(KhatabookDTO myKhatabookDTO, final GenerationDate generationDate) {
         if (myKhatabookDTO == null) {
             return null;
         }

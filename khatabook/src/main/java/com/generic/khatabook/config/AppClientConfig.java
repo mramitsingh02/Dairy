@@ -1,6 +1,7 @@
 package com.generic.khatabook.config;
 
-import com.generic.khatabook.exchanger.SpecificationClientExchanger;
+import com.generic.khatabook.exchanger.ProductClient;
+import com.generic.khatabook.exchanger.SpecificationClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,9 +17,14 @@ public class AppClientConfig {
     }
 
     @Bean
-    public SpecificationClientExchanger specificationClientExchanger() {
+    public SpecificationClient specificationClient() {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient())).build();
-        return factory.createClient(SpecificationClientExchanger.class);
+        return factory.createClient(SpecificationClient.class);
     }
 
+    @Bean
+    public ProductClient productClient() {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(webClient())).build();
+        return factory.createClient(ProductClient.class);
+    }
 }

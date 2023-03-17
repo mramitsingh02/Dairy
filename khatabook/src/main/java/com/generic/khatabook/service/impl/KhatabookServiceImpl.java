@@ -25,6 +25,8 @@ import static java.util.Objects.isNull;
 public class KhatabookServiceImpl implements KhatabookService {
     @Autowired
     private KhatabookRepository myKhatabookRepository;
+    @Autowired
+    private KhatabookMapper myKhatabookMapper;
 
     @Override
     public boolean isValid(final KhatabookDTO khatabookDTO) {
@@ -33,21 +35,21 @@ public class KhatabookServiceImpl implements KhatabookService {
 
     @Override
     public KhatabookDTO get(final String msisdn) {
-        return KhatabookMapper.mapToPojo(myKhatabookRepository.findByMsisdn(msisdn).orElse(null));
+        return myKhatabookMapper.mapToPojo(myKhatabookRepository.findByMsisdn(msisdn).orElse(null));
     }
 
     @Override
     public void create(final KhatabookDTO khatabookDTO) {
 
         log.info("Khatabook {} created.", khatabookDTO.khatabookId());
-        myKhatabookRepository.save(KhatabookMapper.mapToDTO(khatabookDTO, new GenerationDate(LocalDateTime.now(Clock.systemDefaultZone()))));
+        myKhatabookRepository.save(myKhatabookMapper.mapToDTO(khatabookDTO, new GenerationDate(LocalDateTime.now(Clock.systemDefaultZone()))));
         log.info("Khatabook {} successful created.", khatabookDTO.khatabookId());
     }
 
     @Override
     public KhatabookDTO update(final KhatabookDTO khatabookDTO) {
         log.info("Khatabook {} created.", khatabookDTO.khatabookId());
-        myKhatabookRepository.save(KhatabookMapper.mapToDTO(khatabookDTO, new GenerationDate(null, LocalDateTime.now(Clock.systemDefaultZone()))));
+        myKhatabookRepository.save(myKhatabookMapper.mapToDTO(khatabookDTO, new GenerationDate(null, LocalDateTime.now(Clock.systemDefaultZone()))));
 
         log.info("Khatabook {} successful created.", khatabookDTO.khatabookId());
         return getKhatabookByKhatabookId(khatabookDTO.khatabookId());
@@ -59,7 +61,7 @@ public class KhatabookServiceImpl implements KhatabookService {
         if (isNull(khatabookId) && isNull(msisdn)) {
             final Khatabook foundLastKhatabook = myKhatabookRepository.findAll().stream().sorted(Comparator.comparing(Khatabook::getCreatedOn)).findFirst().orElseThrow(() -> new IllegalArgumentException("all value is deleted"));
             myKhatabookRepository.delete(foundLastKhatabook);
-            return KhatabookMapper.mapToPojo(foundLastKhatabook);
+            return myKhatabookMapper.mapToPojo(foundLastKhatabook);
         }
 
         if (khatabookId != null) {
@@ -69,19 +71,18 @@ public class KhatabookServiceImpl implements KhatabookService {
         }
         myKhatabookRepository.delete(customer);
 
-        return KhatabookMapper.mapToPojo(customer);
+        return myKhatabookMapper.mapToPojo(customer);
     }
 
     @Override
     public List<KhatabookDTO> getAll() {
 
-        return myKhatabookRepository.findAll().stream().map(KhatabookMapper::mapToPojo).toList();
+        return myKhatabookRepository.findAll().stream().map(myKhatabookMapper::mapToPojo).toList();
     }
 
     @Override
     public KhatabookDTO getKhatabookByKhatabookId(final String khatabookId) {
-        final Khatabook myKhatabook =
-                myKhatabookRepository.findByKhatabookId(khatabookId).stream().findFirst().orElse(null);
-        return KhatabookMapper.mapToPojo(myKhatabook);
+        final Khatabook myKhatabook = myKhatabookRepository.findByKhatabookId(khatabookId).stream().findFirst().orElse(null);
+        return myKhatabookMapper.mapToPojo(myKhatabook);
     }
 }

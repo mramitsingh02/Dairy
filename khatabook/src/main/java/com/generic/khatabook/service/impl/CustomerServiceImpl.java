@@ -3,9 +3,12 @@ package com.generic.khatabook.service.impl;
 import com.generic.khatabook.entity.Customer;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
+import com.generic.khatabook.model.Container;
 import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.model.CustomerUpdatable;
 import com.generic.khatabook.repository.CustomerRepository;
 import com.generic.khatabook.service.CustomerService;
+import com.generic.khatabook.service.mapper.ContainerCustomerMapper;
 import com.generic.khatabook.service.mapper.CustomerMapper;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
@@ -27,6 +30,8 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository myCustomerRepository;
     @Autowired
     private CustomerMapper myCustomerMapper;
+    @Autowired
+    private ContainerCustomerMapper myContainerCustomerMapper;
 
     //Observability is the ability to measure the internal state of a system only by its external outputs
     //https://www.baeldung.com/spring-boot-3-observability
@@ -39,8 +44,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO getByCustomerId(final String customerId) {
-        return getObservation("getByCustomerId", () -> myCustomerMapper.mapToPojo(myCustomerRepository.findByCustomerId(customerId)));
+    public Container<CustomerDTO, CustomerUpdatable> getByCustomerId(final String customerId) {
+        return myContainerCustomerMapper.mapToPojo(myCustomerRepository.findByCustomerId(customerId));
     }
 
     private CustomerDTO getObservation(final String matrixName, final Supplier<CustomerDTO> supplierTask) {

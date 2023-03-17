@@ -29,5 +29,6 @@ public class Customer {
     @Embedded
     private GenerationDate generationDate;
     private String specificationId;
+    private String productId;
 
 }

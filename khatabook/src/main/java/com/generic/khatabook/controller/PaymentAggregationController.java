@@ -39,7 +39,7 @@ public class PaymentAggregationController {
     @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/aggregate")
     public ResponseEntity<?> aggregatedPayment(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody AggregatePaymentDTO payment) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -50,7 +50,7 @@ public class PaymentAggregationController {
             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
-        myAggregatePaymentService.paymentAggregate(khatabook, customer, payment);
+        myAggregatePaymentService.paymentAggregate(khatabook, customer.get(), payment);
 
         return ResponseEntity.ok().build();
     }
@@ -58,7 +58,7 @@ public class PaymentAggregationController {
     @PostMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}/aggregate")
     public ResponseEntity<?> aggregatedPaymentByMsisdn(@Validated @PathVariable String khatabookId, @Validated @PathVariable String msisdn, @RequestBody AggregatePaymentDTO payment) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -78,7 +78,7 @@ public class PaymentAggregationController {
     @GetMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/aggregate")
     public ResponseEntity<?> getLastAggregatedPayment(@PathVariable String khatabookId, @PathVariable String customerId) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -87,13 +87,13 @@ public class PaymentAggregationController {
         if (Objects.isNull(customer)) {
              return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
-        return ResponseEntity.ok(myAggregatePaymentService.getLastAggregation(khatabook, customer));
+        return ResponseEntity.ok(myAggregatePaymentService.getLastAggregation(khatabook, customer.get()));
     }
 
     @GetMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}/aggregate")
     public ResponseEntity<?> getLastAggregatedPaymentByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }

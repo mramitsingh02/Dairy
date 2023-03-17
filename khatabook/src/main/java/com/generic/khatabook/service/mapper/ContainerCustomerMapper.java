@@ -1,18 +1,26 @@
 package com.generic.khatabook.service.mapper;
 
 import com.generic.khatabook.entity.Customer;
+import com.generic.khatabook.model.Container;
 import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.model.CustomerUpdatable;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomerMapper {
+public class ContainerCustomerMapper {
 
-    public CustomerDTO mapToPojo(Customer myCustomer) {
+    public Container<CustomerDTO, CustomerUpdatable> mapToPojo(Customer myCustomer) {
 
         if (myCustomer == null) {
             return null;
         }
-        return new CustomerDTO(myCustomer.getCustomerId(), myCustomer.getKhatabookId(), myCustomer.getMsisdn(), myCustomer.getFirstName(), myCustomer.getLastName(), myCustomer.getProductId(), myCustomer.getSpecificationId());
+
+
+        final CustomerDTO customerDTO = new CustomerDTO(myCustomer.getCustomerId(), myCustomer.getKhatabookId(), myCustomer.getMsisdn(),
+                                                        myCustomer.getFirstName(), myCustomer.getLastName(), null,
+                                                        myCustomer.getSpecificationId());
+
+        return Container.of(customerDTO, customerDTO.updatable());
     }
 
     public Customer mapToDTO(CustomerDTO myCustomer) {

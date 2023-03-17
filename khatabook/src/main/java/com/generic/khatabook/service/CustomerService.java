@@ -1,6 +1,8 @@
 package com.generic.khatabook.service;
 
+import com.generic.khatabook.model.Container;
 import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.model.CustomerUpdatable;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -9,7 +11,7 @@ import java.util.Set;
 public interface CustomerService {
     boolean isValid(CustomerDTO customerDTO);
 
-    CustomerDTO getByCustomerId(String msisdn);
+    Container<CustomerDTO, CustomerUpdatable> getByCustomerId(String msisdn);
 
     CustomerDTO getByMsisdn(String msisdn);
 

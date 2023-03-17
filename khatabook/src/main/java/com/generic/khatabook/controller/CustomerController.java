@@ -3,8 +3,9 @@ package com.generic.khatabook.controller;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.InvalidArgumentException;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.exchanger.SpecificationClientExchanger;
+import com.generic.khatabook.exchanger.SpecificationClient;
 import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.model.CustomerUpdatable;
 import com.generic.khatabook.model.KhatabookDetails;
 import com.generic.khatabook.model.KhatabookPaymentSummary;
 import com.generic.khatabook.model.PaymentDTO;
@@ -13,10 +14,12 @@ import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.IdGeneratorService;
 import com.generic.khatabook.service.KhatabookService;
 import com.generic.khatabook.service.PaymentService;
+import com.generic.khatabook.validator.CustomerValidation;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,15 +50,18 @@ public class CustomerController {
     @Autowired
     private PaymentService myPaymentService;
     @Autowired
-    private SpecificationClientExchanger mySpecificationClientExchanger;
+    private SpecificationClient mySpecificationClient;
 
     @Autowired
     private IdGeneratorService myIdGeneratorService;
 
+    @Autowired
+    private CustomerValidation myCustomerValidation;
+
     @GetMapping(path = "/khatabook/{khatabookId}/customers")
     public ResponseEntity<?> getKhatabookDetails(@PathVariable String khatabookId) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -67,13 +73,13 @@ public class CustomerController {
     @PostMapping(path = "/khatabook/{khatabookId}/customer")
     public ResponseEntity<?> createCustomer(@PathVariable String khatabookId, @RequestBody CustomerDTO customerDTO) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         try {
-            final ResponseEntity<SpecificationDTO> responseEntity = mySpecificationClientExchanger.getSpecificationId(customerDTO.specificationId());
+            final ResponseEntity<SpecificationDTO> responseEntity = mySpecificationClient.getSpecificationId(customerDTO.specificationId());
             if (!responseEntity.hasBody()) {
                 return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId()).get()).build();
             }
@@ -82,7 +88,7 @@ public class CustomerController {
         }
 
 
-        final val customer = customerDTO.copyOf(myIdGeneratorService.generateId());
+        val customer = customerDTO.copyOf(myIdGeneratorService.generateId());
         myCustomerService.create(customer);
         EntityModel<CustomerDTO> entityModel = EntityModel.of(customer);
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByCustomerId(khatabookId, customer.customerId())).withSelfRel());
@@ -93,11 +99,11 @@ public class CustomerController {
 
     @GetMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", produces = {"application/hal+json"})
     public ResponseEntity<?> getCustomerByCustomerId(@PathVariable String khatabookId, @PathVariable String customerId) {
-        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
         if (Objects.isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -122,7 +128,7 @@ public class CustomerController {
     @GetMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}", produces = {"application/hal+json"})
     public ResponseEntity<?> getCustomerByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -163,7 +169,7 @@ public class CustomerController {
 
     @DeleteMapping(path = "/khatabook/{khatabookId}/customer/{customerId}")
     public ResponseEntity<CustomerDTO> deleteByCustomerId(@PathVariable String customerId) {
-        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
         if (Objects.isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
@@ -177,11 +183,11 @@ public class CustomerController {
     @PutMapping(path = "/khatabook/{khatabookId}/customer/{customerId}")
     public ResponseEntity<EntityModel<KhatabookDetails>> updateCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody CustomerDTO customerDTO) {
 
-        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
         if (Objects.isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -205,23 +211,31 @@ public class CustomerController {
 
     @PatchMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", consumes = "application/json-patch+json")
     public ResponseEntity<?> updatePartialCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody Map<String, Object> customerEntities) {
-        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        final CustomerUpdatable customerDetails = myCustomerService.getByCustomerId(customerId).updatable();
         if (Objects.isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         for (final Map.Entry<String, Object> member : customerEntities.entrySet()) {
-            final Field field = ReflectionUtils.findField(CustomerDTO.class, member.getKey());
+            final Field field = ReflectionUtils.findField(CustomerUpdatable.class, member.getKey());
             if (Objects.nonNull(field)) {
+                field.setAccessible(true);
                 ReflectionUtils.setField(field, customerDetails, member.getValue());
+            } else {
+                throw new InvalidArgumentException(AppEntity.CUSTOMER, member.getKey());
             }
-            throw new InvalidArgumentException(AppEntity.PRODUCT, member.getKey());
         }
-        final CustomerDTO updateCustomer = myCustomerService.update(customerDetails);
+
+        final ProblemDetail customerProductValidation = myCustomerValidation.doCustomerProductValidation(customerDetails.getProductId());
+        if (Objects.nonNull(customerProductValidation)) {
+            return ResponseEntity.of(customerProductValidation).build();
+        }
+
+        final CustomerDTO updateCustomer = myCustomerService.update(customerDetails.build());
 
         return ResponseEntity.ok(updateCustomer);
     }

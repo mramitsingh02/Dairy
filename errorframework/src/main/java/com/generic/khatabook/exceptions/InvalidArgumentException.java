@@ -8,11 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class InvalidArgumentException extends  RuntimeException {
 
     public InvalidArgumentException(final AppEntity appEntity, final String invalidMember) {
-        super(appEntity.getName() + " don't have " + invalidMember + "member, invalid argument fount.!.");
-    }
-
-    public InvalidArgumentException(final AppEntity appEntity, final float rating) {
-        super(appEntity.getName() + " don't have " + rating + "member, invalid argument fount.!.");
+        super(appEntity.getName() + " don't have " + invalidMember + " member, invalid argument fount.!.");
     }
 
     public ProblemDetail get() {

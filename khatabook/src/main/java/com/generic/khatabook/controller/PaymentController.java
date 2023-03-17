@@ -37,7 +37,7 @@ public class PaymentController {
     @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/pay")
     public ResponseEntity<?> gavenToCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody PaymentDTO payment) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -48,7 +48,7 @@ public class PaymentController {
              return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
-        myPaymentService.savePayment(khatabook, customer, payment, PaymentType.CREDIT);
+        myPaymentService.savePayment(khatabook, customer.get(), payment, PaymentType.CREDIT);
 
         return ResponseEntity.ok().build();
     }
@@ -56,7 +56,7 @@ public class PaymentController {
     @PostMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}/pay")
     public ResponseEntity<?> gavenToCustomerByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn, @RequestBody PaymentDTO payment) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -74,7 +74,7 @@ public class PaymentController {
     @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/receive")
     public ResponseEntity<?> receiveFromCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody PaymentDTO payment) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
@@ -84,7 +84,7 @@ public class PaymentController {
         if (Objects.isNull(customer)) {
              return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
-        myPaymentService.savePayment(khatabook, customer, payment, PaymentType.DEBIT);
+        myPaymentService.savePayment(khatabook, customer.get(), payment, PaymentType.DEBIT);
 
         return ResponseEntity.ok().build();
     }
@@ -92,7 +92,7 @@ public class PaymentController {
     @PostMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}/receive")
     public ResponseEntity<?> receiveFromCustomerByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn, @RequestBody PaymentDTO payment) {
 
-        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }

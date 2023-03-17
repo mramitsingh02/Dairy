@@ -34,7 +34,7 @@ public class KhatabookController {
     @PostMapping("/khatabook/khatabook")
     public ResponseEntity<KhatabookDTO> createKhatabook(@RequestBody KhatabookDTO khatabook) {
 
-        final val khatabookRequest = khatabook.copyOf(myIdGeneratorService.generateId());
+        val khatabookRequest = khatabook.copyOf(myIdGeneratorService.generateId());
 
         if (!myKhatabookService.isValid(khatabookRequest)) {
             myKhatabookService.create(khatabookRequest);
