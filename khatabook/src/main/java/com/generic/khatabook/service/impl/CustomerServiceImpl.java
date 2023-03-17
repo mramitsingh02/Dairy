@@ -1,7 +1,7 @@
 package com.generic.khatabook.service.impl;
 
-import com.generic.khatabook.entity.AppEntity;
 import com.generic.khatabook.entity.Customer;
+import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.repository.CustomerRepository;

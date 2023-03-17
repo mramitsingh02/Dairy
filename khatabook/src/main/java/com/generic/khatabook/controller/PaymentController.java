@@ -1,6 +1,6 @@
 package com.generic.khatabook.controller;
 
-import com.generic.khatabook.entity.AppEntity;
+import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.PaymentDTO;
 import com.generic.khatabook.model.PaymentType;
@@ -39,13 +39,13 @@ public class PaymentController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByCustomerId(customerId);
 
         if (Objects.isNull(customer)) {
-            throw new NotFoundException(AppEntity.CUSTOMER, customerId);
+             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
         myPaymentService.savePayment(khatabook, customer, payment, PaymentType.CREDIT);
@@ -58,7 +58,7 @@ public class PaymentController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByMsisdn(payment.to());
@@ -76,13 +76,13 @@ public class PaymentController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
 
         final var customer = myCustomerService.getByCustomerId(payment.from());
         if (Objects.isNull(customer)) {
-            throw new NotFoundException(AppEntity.CUSTOMER, customerId);
+             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         myPaymentService.savePayment(khatabook, customer, payment, PaymentType.DEBIT);
 
@@ -94,7 +94,7 @@ public class PaymentController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByMsisdn(msisdn);

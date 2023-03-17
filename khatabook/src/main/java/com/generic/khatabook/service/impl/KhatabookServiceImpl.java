@@ -1,8 +1,8 @@
 package com.generic.khatabook.service.impl;
 
-import com.generic.khatabook.entity.AppEntity;
 import com.generic.khatabook.entity.GenerationDate;
 import com.generic.khatabook.entity.Khatabook;
+import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.KhatabookDTO;
 import com.generic.khatabook.repository.KhatabookRepository;
@@ -33,7 +33,7 @@ public class KhatabookServiceImpl implements KhatabookService {
 
     @Override
     public KhatabookDTO get(final String msisdn) {
-        return KhatabookMapper.mapToPojo(myKhatabookRepository.findByMsisdn(msisdn).orElseThrow(() -> new NotFoundException(AppEntity.MSISDN, msisdn)));
+        return KhatabookMapper.mapToPojo(myKhatabookRepository.findByMsisdn(msisdn).orElse(null));
     }
 
     @Override
@@ -65,7 +65,7 @@ public class KhatabookServiceImpl implements KhatabookService {
         if (khatabookId != null) {
             customer = myKhatabookRepository.findByKhatabookId(khatabookId).orElseThrow(() -> new NotFoundException(AppEntity.KHATABOOK, khatabookId));
         } else {
-            customer = myKhatabookRepository.findByMsisdn(msisdn).orElseThrow(() -> new NotFoundException(AppEntity.MSISDN, msisdn));
+            customer = myKhatabookRepository.findByMsisdn(msisdn).orElse(null);
         }
         myKhatabookRepository.delete(customer);
 
@@ -80,7 +80,8 @@ public class KhatabookServiceImpl implements KhatabookService {
 
     @Override
     public KhatabookDTO getKhatabookByKhatabookId(final String khatabookId) {
-        final Khatabook myKhatabook = myKhatabookRepository.findByKhatabookId(khatabookId).stream().findFirst().orElseThrow(() -> new NotFoundException(AppEntity.KHATABOOK, khatabookId));
+        final Khatabook myKhatabook =
+                myKhatabookRepository.findByKhatabookId(khatabookId).stream().findFirst().orElse(null);
         return KhatabookMapper.mapToPojo(myKhatabook);
     }
 }

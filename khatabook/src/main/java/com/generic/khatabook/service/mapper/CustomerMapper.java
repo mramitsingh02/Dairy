@@ -7,15 +7,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomerMapper {
 
-    public  CustomerDTO mapToPojo(Customer myCustomer) {
+    public CustomerDTO mapToPojo(Customer myCustomer) {
 
         if (myCustomer == null) {
             return null;
         }
-        return new CustomerDTO(myCustomer.getCustomerId(), myCustomer.getKhatabookId(), myCustomer.getMsisdn(), myCustomer.getFirstName(), myCustomer.getLastName());
+        return new CustomerDTO(myCustomer.getCustomerId(), myCustomer.getKhatabookId(), myCustomer.getMsisdn(), myCustomer.getFirstName(), myCustomer.getLastName(), myCustomer.getSpecificationId());
     }
 
-    public  Customer mapToDTO(CustomerDTO myCustomerDTO) {
+    public Customer mapToDTO(CustomerDTO myCustomerDTO) {
         if (myCustomerDTO == null) {
             return null;
         }

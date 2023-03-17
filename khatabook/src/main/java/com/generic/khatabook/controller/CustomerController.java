@@ -1,11 +1,14 @@
 package com.generic.khatabook.controller;
 
-import com.generic.khatabook.entity.AppEntity;
+import com.generic.khatabook.exceptions.AppEntity;
+import com.generic.khatabook.exceptions.InvalidArgumentException;
 import com.generic.khatabook.exceptions.NotFoundException;
+import com.generic.khatabook.exchanger.SpecificationClientExchanger;
 import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.KhatabookDetails;
 import com.generic.khatabook.model.KhatabookPaymentSummary;
 import com.generic.khatabook.model.PaymentDTO;
+import com.generic.khatabook.model.SpecificationDTO;
 import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.IdGeneratorService;
 import com.generic.khatabook.service.KhatabookService;
@@ -15,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -39,6 +46,8 @@ public class CustomerController {
 
     @Autowired
     private PaymentService myPaymentService;
+    @Autowired
+    private SpecificationClientExchanger mySpecificationClientExchanger;
 
     @Autowired
     private IdGeneratorService myIdGeneratorService;
@@ -48,7 +57,7 @@ public class CustomerController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, myCustomerService.getAll(khatabookId), myPaymentService.getPaymentDetailByKhatabookId(khatabookId));
@@ -60,8 +69,18 @@ public class CustomerController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
+
+        try {
+            final ResponseEntity<SpecificationDTO> responseEntity = mySpecificationClientExchanger.getSpecificationId(customerDTO.specificationId());
+            if (!responseEntity.hasBody()) {
+                return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId()).get()).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId()).get()).build();
+        }
+
 
         final val customer = customerDTO.copyOf(myIdGeneratorService.generateId());
         myCustomerService.create(customer);
@@ -76,11 +95,11 @@ public class CustomerController {
     public ResponseEntity<?> getCustomerByCustomerId(@PathVariable String khatabookId, @PathVariable String customerId) {
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
         if (Objects.isNull(customerDetails)) {
-            throw new NotFoundException(AppEntity.CUSTOMER, customerId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
@@ -105,7 +124,7 @@ public class CustomerController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final CustomerDTO customerDetails = myCustomerService.getCustomerByMsisdn(khatabookId, msisdn);
@@ -142,16 +161,68 @@ public class CustomerController {
         return ResponseEntity.ok(customerDetails);
     }
 
-    @DeleteMapping(path = "/khatabook/{khatabookId}/customer/id/{id}")
-    public CustomerDTO deleteById(@PathVariable Long id) {
-        return new CustomerDTO("", "", "msisdn", "dummy", "dummy");
+    @DeleteMapping(path = "/khatabook/{khatabookId}/customer/{customerId}")
+    public ResponseEntity<CustomerDTO> deleteByCustomerId(@PathVariable String customerId) {
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        if (Objects.isNull(customerDetails)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+        }
+
+
+        myCustomerService.delete(null, customerDetails.msisdn());
+
+        return ResponseEntity.ok(customerDetails);
     }
 
-    @PutMapping(path = "/khatabook/{khatabookId}/customer")
-    public CustomerDTO updateCustomer(@RequestBody CustomerDTO customerDTO) {
+    @PutMapping(path = "/khatabook/{khatabookId}/customer/{customerId}")
+    public ResponseEntity<EntityModel<KhatabookDetails>> updateCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody CustomerDTO customerDTO) {
 
-        return customerDTO;
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        if (Objects.isNull(customerDetails)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+        }
+        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
+        if (Objects.isNull(khatabook)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
+        }
+
+        final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
+
+        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy);
+        final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(null);
+
+        Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomer(khatabookId, customerLink, PaymentDTO.nullOf())).withRel("PayTo");
+
+        Link linkForReceivePayment = linkTo(methodOn(PaymentController.class).receiveFromCustomer(khatabookId, customerLink, PaymentDTO.nullOf())).withRel("WithdrawFrom");
+        Link linkForAggregate = linkTo(methodOn(PaymentAggregationController.class).aggregatedPayment(khatabookId, customerLink, null)).withRel("Aggregate");
+
+        EntityModel<KhatabookDetails> entityModel = EntityModel.of(khatabookDetails);
+        entityModel.add(linkForGivePayment);
+        entityModel.add(linkForReceivePayment);
+        entityModel.add(linkForAggregate);
+        return ResponseEntity.ok(entityModel);
     }
 
+    @PatchMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", consumes = "application/json-patch+json")
+    public ResponseEntity<?> updatePartialCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody Map<String, Object> customerEntities) {
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId);
+        if (Objects.isNull(customerDetails)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+        }
+        final val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
+        if (Objects.isNull(khatabook)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
+        }
 
+        for (final Map.Entry<String, Object> member : customerEntities.entrySet()) {
+            final Field field = ReflectionUtils.findField(CustomerDTO.class, member.getKey());
+            if (Objects.nonNull(field)) {
+                ReflectionUtils.setField(field, customerDetails, member.getValue());
+            }
+            throw new InvalidArgumentException(AppEntity.PRODUCT, member.getKey());
+        }
+        final CustomerDTO updateCustomer = myCustomerService.update(customerDetails);
+
+        return ResponseEntity.ok(updateCustomer);
+    }
 }

@@ -11,7 +11,4 @@ public record KhatabookDTO(String bookId, String khatabookId, String msisdn, Str
         return new KhatabookDTO(bookId, this.khatabookId, this.msisdn, this.partnerName, this.partnerDescription);
     }
 
-    public CustomerDTO customerData() {
-        return new CustomerDTO(khatabookId, khatabookId, msisdn, null, null);
-    }
 }

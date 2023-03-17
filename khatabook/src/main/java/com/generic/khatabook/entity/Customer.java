@@ -28,5 +28,6 @@ public class Customer {
     private String lastName;
     @Embedded
     private GenerationDate generationDate;
+    private String specificationId;
 
 }

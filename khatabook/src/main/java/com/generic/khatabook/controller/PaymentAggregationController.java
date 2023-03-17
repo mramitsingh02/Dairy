@@ -1,6 +1,6 @@
 package com.generic.khatabook.controller;
 
-import com.generic.khatabook.entity.AppEntity;
+import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.AggregatePaymentDTO;
 import com.generic.khatabook.service.AggregatePaymentService;
@@ -41,13 +41,13 @@ public class PaymentAggregationController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByCustomerId(customerId);
 
         if (Objects.isNull(customer)) {
-            throw new NotFoundException(AppEntity.CUSTOMER, customerId);
+            return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
         myAggregatePaymentService.paymentAggregate(khatabook, customer, payment);
@@ -60,7 +60,7 @@ public class PaymentAggregationController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByMsisdn(msisdn);
@@ -80,12 +80,12 @@ public class PaymentAggregationController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByCustomerId(customerId);
         if (Objects.isNull(customer)) {
-            throw new NotFoundException(AppEntity.CUSTOMER, customerId);
+             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         return ResponseEntity.ok(myAggregatePaymentService.getLastAggregation(khatabook, customer));
     }
@@ -95,7 +95,7 @@ public class PaymentAggregationController {
 
         final val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
-            throw new NotFoundException(AppEntity.KHATABOOK, khatabookId);
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final var customer = myCustomerService.getByMsisdn(msisdn);

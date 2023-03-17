@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.generic.*"})
+@ComponentScan(basePackages = {"com.generic.khatabook.*", "com.generic.khatabook.config"})
 @EnableJpaRepositories("com.generic.khatabook.repository")
 public class GenericKhatabookApplication {
 

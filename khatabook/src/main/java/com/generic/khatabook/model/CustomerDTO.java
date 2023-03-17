@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record CustomerDTO(String customerId, String khatabookId, String msisdn, String firstName, String lastName) {
+public record CustomerDTO(String customerId, String khatabookId, String msisdn, String firstName, String lastName, String specificationId) {
     public static final String ANONYMOUS = "Anonymous";
 
 
     public CustomerDTO copyOf(final String generateId) {
-        return new CustomerDTO(generateId, this.khatabookId, this.msisdn, this.firstName, this.lastName);
+        return new CustomerDTO(generateId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.specificationId);
     }
 
 

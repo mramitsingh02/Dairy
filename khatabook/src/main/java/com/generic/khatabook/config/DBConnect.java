@@ -1,14 +1,17 @@
 package com.generic.khatabook.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
+import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 
 //@Configuration
@@ -21,17 +24,13 @@ public class DBConnect {
     @Autowired
     private Environment env;
 
-    @Bean
-    public DriverManagerDataSource dataSource(){
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty(PROP_DB_DRIVER_CLASS));
-        dataSource.setUrl(env.getProperty(PROP_DB_URL));
-        dataSource.setUsername(env.getProperty(PROP_DB_USER));
-        dataSource.setPassword(env.getProperty(PROP_DB_PASS));
-        return dataSource;
+    @Bean("dataSource")
+    @Primary
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().driverClassName(env.getProperty(PROP_DB_DRIVER_CLASS)).url(env.getProperty(PROP_DB_URL)).username(env.getProperty(PROP_DB_USER)).password(env.getProperty(PROP_DB_PASS)).build();
     }
 
-    @Bean
+    @Bean("entityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
@@ -39,12 +38,12 @@ public class DBConnect {
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
-        em.setJpaProperties(additionalProperties());
+        em.setJpaPropertyMap(additionalProperties());
 
         return em;
     }
 
-    private Properties additionalProperties() {
+    private Map<String, Object> additionalProperties() {
         return null;
     }
 }
