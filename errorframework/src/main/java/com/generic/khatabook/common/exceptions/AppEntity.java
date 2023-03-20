@@ -1,4 +1,4 @@
-package com.generic.khatabook.exceptions;
+package com.generic.khatabook.common.exceptions;
 
 public enum AppEntity {
 

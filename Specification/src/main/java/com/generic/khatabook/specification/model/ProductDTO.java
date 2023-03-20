@@ -7,4 +7,10 @@ public record ProductDTO(String id, String name, BigDecimal price, UnitOfMeasure
     public ProductDTO copyOf(final String productId) {
         return new ProductDTO(productId, name, price, unitOfMeasurement, rating);
     }
+
+
+    public ProductUpdatable updatable() {
+        return new ProductUpdatable(this.id, this.name, this.price, this.unitOfMeasurement, this.rating);
+    }
+
 }

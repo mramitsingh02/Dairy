@@ -1,4 +1,4 @@
-package com.generic.khatabook.exceptions;
+package com.generic.khatabook.common.exceptions;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 

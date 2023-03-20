@@ -1,8 +1,10 @@
 package com.generic.khatabook.specification.services.impl;
 
+import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.specification.entity.Product;
 import com.generic.khatabook.specification.model.ProductDTO;
 import com.generic.khatabook.specification.model.ProductRatingDTO;
+import com.generic.khatabook.specification.model.ProductUpdatable;
 import com.generic.khatabook.specification.repository.ProductManagementRepository;
 import com.generic.khatabook.specification.services.ProductManagementService;
 import com.generic.khatabook.specification.services.mapper.ProductMapper;
@@ -40,11 +42,11 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     public ProductDTO saveProduct(final ProductDTO product) {
 
-        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product)));
+        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product))).get();
     }
 
     @Override
-    public ProductDTO findProductById(final String productId) {
+    public Container<ProductDTO, ProductUpdatable> findProductById(final String productId) {
         return myProductMapper.mapToDTO(myProductManagementRepository.findById(productId).orElse(null));
     }
 
@@ -55,7 +57,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
 
     @Override
     public ProductDTO updateProduct(final ProductDTO product) {
-        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product)));
+        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product))).get();
     }
 
     @Override

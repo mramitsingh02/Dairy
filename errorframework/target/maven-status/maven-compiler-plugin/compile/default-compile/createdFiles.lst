@@ -1,6 +1,6 @@
-com\generic\khatabook\exceptions\IncompatibleStateException.class
-com\generic\khatabook\exceptions\LimitBonusException$Limit.class
-com\generic\khatabook\exceptions\InvalidArgumentException.class
-com\generic\khatabook\exceptions\LimitBonusException.class
-com\generic\khatabook\exceptions\NotFoundException.class
-com\generic\khatabook\exceptions\AppEntity.class
+com\generic\khatabook\common\exceptions\IncompatibleStateException.class
+com\generic\khatabook\common\exceptions\LimitBonusException.class
+com\generic\khatabook\common\exceptions\LimitBonusException$Limit.class
+com\generic\khatabook\common\exceptions\AppEntity.class
+com\generic\khatabook\common\exceptions\InvalidArgumentException.class
+com\generic\khatabook\common\exceptions\NotFoundException.class

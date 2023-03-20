@@ -1,7 +1,7 @@
 package com.generic.khatabook.specification.controller;
 
-import com.generic.khatabook.exceptions.AppEntity;
-import com.generic.khatabook.exceptions.NotFoundException;
+import com.generic.khatabook.common.exceptions.AppEntity;
+import com.generic.khatabook.common.exceptions.NotFoundException;
 import com.generic.khatabook.specification.model.SpecificationDTO;
 import com.generic.khatabook.specification.services.SpecificationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
