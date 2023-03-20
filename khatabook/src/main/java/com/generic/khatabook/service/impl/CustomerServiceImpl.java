@@ -40,12 +40,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean isValid(CustomerDTO customerDTO) {
-        return myCustomerMapper.mapToPojo(myCustomerRepository.existsByMsisdn(customerDTO.msisdn())) != null;
+        return myCustomerMapper.mapToPojo(myCustomerRepository.findByMsisdn(customerDTO.msisdn())) != null;
     }
 
     @Override
     public Container<CustomerDTO, CustomerUpdatable> getByCustomerId(final String customerId) {
-        return myContainerCustomerMapper.mapToPojo(myCustomerRepository.findByCustomerId(customerId));
+        return myContainerCustomerMapper.mapToPojo(myCustomerRepository.findById(customerId).orElse(null));
     }
 
     private CustomerDTO getObservation(final String matrixName, final Supplier<CustomerDTO> supplierTask) {
@@ -69,10 +69,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO delete(Long id, String msisdn) {
+    public CustomerDTO delete(String customerId, String msisdn) {
         Customer customer;
-        if (id != null) {
-            customer = myCustomerRepository.findById(id).orElseThrow(() -> new NotFoundException(AppEntity.ID, id));
+        if (customerId != null) {
+            customer = myCustomerRepository.findById(customerId).orElseThrow(() -> new NotFoundException(AppEntity.ID, customerId));
         } else {
             customer = myCustomerRepository.findByMsisdn(msisdn);
         }

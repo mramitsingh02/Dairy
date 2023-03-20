@@ -19,7 +19,7 @@ public interface CustomerService {
 
     CustomerDTO update(CustomerDTO customerDTO);
 
-    CustomerDTO delete(Long id, String msidn);
+    CustomerDTO delete(String customerId, String msidn);
 
     Set<CustomerDTO> getAll(final String khatabookId);
 

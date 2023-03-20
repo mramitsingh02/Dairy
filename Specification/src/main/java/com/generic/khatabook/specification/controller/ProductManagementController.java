@@ -4,9 +4,9 @@ import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.InvalidArgumentException;
 import com.generic.khatabook.exceptions.LimitBonusException;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.specification.entity.Product;
 import com.generic.khatabook.specification.model.ProductDTO;
 import com.generic.khatabook.specification.model.ProductRatingDTO;
+import com.generic.khatabook.specification.services.IdGeneratorService;
 import com.generic.khatabook.specification.services.ProductManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,20 +31,22 @@ public class ProductManagementController {
 
     private ProductManagementService myProductManagementService;
 
+    private IdGeneratorService myIdGeneratorService;
+
     @Autowired
-    public ProductManagementController(final ProductManagementService thatProductManagementService) {
-        this.myProductManagementService = thatProductManagementService;
+    public ProductManagementController(final ProductManagementService productManagementService, final IdGeneratorService idGeneratorService) {
+        this.myProductManagementService = productManagementService;
+        this.myIdGeneratorService = idGeneratorService;
     }
 
 
     @GetMapping(path = "/products")
     public ResponseEntity<?> getAllProducts() {
-        final List<ProductDTO> products = myProductManagementService.getAllProducts();
 
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(myProductManagementService.getAllProducts());
     }
 
-    @PostMapping("/product/id/{productId}/rating")
+    @PostMapping("/product/{productId}/rating")
     public ResponseEntity<?> saveProductRating(@RequestBody ProductRatingDTO productRatingDTO) {
         final ProductDTO product = myProductManagementService.findProductById(productRatingDTO.productId());
         if (Objects.isNull(product)) {
@@ -55,7 +57,7 @@ public class ProductManagementController {
         } else if (productRatingDTO.rating() < 0) {
             return ResponseEntity.of(new LimitBonusException(AppEntity.PRODUCT, LimitBonusException.Limit.MIN, productRatingDTO.rating()).get()).build();
         }
-        myProductManagementService.saveProductRating(productRatingDTO);
+        myProductManagementService.saveProductRating(productRatingDTO.copyOf(myIdGeneratorService.generateId()));
         return ResponseEntity.ok().build();
     }
 
@@ -66,8 +68,8 @@ public class ProductManagementController {
         if (Objects.isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, product.name()).get()).build();
         }
-        final Product newProduct = myProductManagementService.saveProduct(product);
-        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/id/{id}").buildAndExpand(product.productId()).toUri()).body(newProduct);
+        final ProductDTO newProduct = myProductManagementService.saveProduct(product.copyOf(myIdGeneratorService.generateId()));
+        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{productId}").buildAndExpand(product.id()).toUri()).body(newProduct);
     }
 
     @PostMapping(path = "/products")
@@ -80,21 +82,21 @@ public class ProductManagementController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/product/id/{productId}")
-    public ResponseEntity<?> getProductById(@PathVariable String productId) {
-        final ProductDTO entityModel = myProductManagementService.findProductById(productId);
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<?> getProductById(@PathVariable String id) {
+        final ProductDTO entityModel = myProductManagementService.findProductById(id);
         if (Objects.isNull(entityModel)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productId).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, id).get()).build();
         }
 
         return ResponseEntity.ok(entityModel);
     }
 
-    @DeleteMapping("/product/id/{productId}")
-    public ResponseEntity<?> deleteProductById(@PathVariable String productId) {
-        final ProductDTO entityModel = myProductManagementService.findProductById(productId);
+    @DeleteMapping("/product/{productId}")
+    public ResponseEntity<?> deleteProductById(@PathVariable String id) {
+        final ProductDTO entityModel = myProductManagementService.findProductById(id);
         if (Objects.isNull(entityModel)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productId).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, id).get()).build();
         }
 
         myProductManagementService.delete(entityModel);
@@ -102,7 +104,7 @@ public class ProductManagementController {
     }
 
 
-    @PutMapping("/product/id/{productId}")
+    @PutMapping("/product/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable String productId, @RequestBody ProductDTO product) {
         final ProductDTO entityModel = myProductManagementService.findProductById(productId);
         if (Objects.isNull(entityModel)) {
@@ -112,7 +114,7 @@ public class ProductManagementController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping(path = "/product/id/{productId}", consumes = "application/json-patch+json")
+    @PatchMapping(path = "/product/{productId}", consumes = "application/json-patch+json")
     public ResponseEntity<?> updatePartialProduct(@PathVariable String productId, @RequestBody Map<String, Object> productEntities) {
         final ProductDTO entityModel = myProductManagementService.findProductById(productId);
         if (Objects.isNull(entityModel)) {

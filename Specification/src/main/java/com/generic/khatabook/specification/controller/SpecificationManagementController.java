@@ -37,7 +37,7 @@ public class SpecificationManagementController {
         }
         final SpecificationDTO savedSpecification = mySpecificationManagementService.addSpecification(specification);
 
-        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/id/{id}").buildAndExpand(savedSpecification.id()).toUri()).body(savedSpecification);
+        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{specificationId}").buildAndExpand(savedSpecification.id()).toUri()).body(savedSpecification);
     }
 
     @GetMapping(path = "/specifications")
@@ -45,31 +45,31 @@ public class SpecificationManagementController {
         return ResponseEntity.ok(mySpecificationManagementService.findAll());
     }
 
-    @GetMapping("specification/id/{id}")
-    public ResponseEntity<SpecificationDTO> getSpecificationId(@PathVariable String id) {
+    @GetMapping("specification/{specificationId}")
+    public ResponseEntity<SpecificationDTO> getSpecificationId(@PathVariable String specificationId) {
 
-        final SpecificationDTO specification = mySpecificationManagementService.find(id);
+        final SpecificationDTO specification = mySpecificationManagementService.find(specificationId);
         if (isNull(specification)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, id).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, specificationId).get()).build();
         }
         return ResponseEntity.ok(specification);
     }
 
-    @DeleteMapping("specification/id/{id}")
-    public ResponseEntity<SpecificationDTO> deleteSpecificationId(@PathVariable String id) {
-        final SpecificationDTO specification = mySpecificationManagementService.find(id);
+    @DeleteMapping("specification/{specificationId}")
+    public ResponseEntity<SpecificationDTO> deleteSpecificationId(@PathVariable String specificationId) {
+        final SpecificationDTO specification = mySpecificationManagementService.find(specificationId);
         if (isNull(specification)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, id).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, specificationId).get()).build();
         }
         mySpecificationManagementService.deleteSpecifications(specification);
         return ResponseEntity.ok(specification);
     }
 
-    @PutMapping("specification/id/{id}")
-    public ResponseEntity<?> updateSpecificationId(@PathVariable String id, @RequestBody SpecificationDTO specificationDTO) {
-        final SpecificationDTO specification = mySpecificationManagementService.find(id);
+    @PutMapping("specification/{specificationId}")
+    public ResponseEntity<?> updateSpecificationId(@PathVariable String specificationId, @RequestBody SpecificationDTO specificationDTO) {
+        final SpecificationDTO specification = mySpecificationManagementService.find(specificationId);
         if (isNull(specification)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, id).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, specificationId).get()).build();
         }
         return ResponseEntity.ok(mySpecificationManagementService.updateSpecification(specificationDTO));
     }

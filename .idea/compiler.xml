@@ -11,10 +11,12 @@
         <module name="specification" />
         <module name="khatabook" />
         <module name="liquidbook" />
+        <module name="common" />
         <module name="errorframework" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="common" target="17" />
       <module name="Dairy" target="1.5" />
       <module name="errorframework" target="17" />
       <module name="errorframework (1)" target="17" />
@@ -25,6 +27,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="common" options="-parameters" />
       <module name="errorframework" options="-parameters" />
       <module name="errorframework (1)" options="-parameters" />
       <module name="khatabook" options="-parameters" />

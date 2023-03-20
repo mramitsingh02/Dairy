@@ -10,7 +10,9 @@ import java.util.Objects;
 
 @Embeddable
 public class GenerationDate {
+    @CreationTimestamp
     private final LocalDateTime createdOn;
+    @UpdateTimestamp
     private final LocalDateTime updatedOn;
     private final LocalDateTime deletedOn;
 

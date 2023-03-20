@@ -14,7 +14,7 @@ public interface SpecificationClient {
     @GetExchange("/specifications")
     public ResponseEntity<List<SpecificationDTO>> getAllSpecification();
 
-    @GetExchange("/specification/id/{id}")
+    @GetExchange("/specification/{specificationId}")
     public ResponseEntity<SpecificationDTO> getSpecificationId(@PathVariable String id);
 
 }

@@ -78,13 +78,15 @@ public class CustomerController {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
-        try {
-            final ResponseEntity<SpecificationDTO> responseEntity = mySpecificationClient.getSpecificationId(customerDTO.specificationId());
-            if (!responseEntity.hasBody()) {
+        if (customerDTO.specificationId() != null) {
+            try {
+                final ResponseEntity<SpecificationDTO> responseEntity = mySpecificationClient.getSpecificationId(customerDTO.specificationId());
+                if (!responseEntity.hasBody()) {
+                    return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId()).get()).build();
+                }
+            } catch (Exception e) {
                 return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId()).get()).build();
             }
-        } catch (Exception e) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId()).get()).build();
         }
 
 
@@ -94,7 +96,7 @@ public class CustomerController {
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByCustomerId(khatabookId, customer.customerId())).withSelfRel());
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByMsisdn(khatabookId, customer.msisdn())).withSelfRel());
 
-        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/id/{id}").buildAndExpand(customerDTO.customerId()).toUri()).body(entityModel);
+        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{specificationId}").buildAndExpand(customerDTO.customerId()).toUri()).body(entityModel);
     }
 
     @GetMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", produces = {"application/hal+json"})
@@ -175,7 +177,7 @@ public class CustomerController {
         }
 
 
-        myCustomerService.delete(null, customerDetails.msisdn());
+        myCustomerService.delete(customerId, customerDetails.msisdn());
 
         return ResponseEntity.ok(customerDetails);
     }

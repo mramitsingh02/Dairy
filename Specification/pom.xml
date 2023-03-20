@@ -15,6 +15,7 @@
     <description>Khatabook Specification project for Spring Boot</description>
     <properties>
         <java.version>17</java.version>
+        <project.version>0.0.1-SNAPSHOT</project.version>
     </properties>
     <dependencies>
         <dependency>
@@ -60,7 +61,7 @@
         <dependency>
             <groupId>com.generic.khatabook</groupId>
             <artifactId>errorframework</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 		<dependency>
 			<groupId>mysql</groupId>

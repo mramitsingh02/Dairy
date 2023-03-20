@@ -1,6 +1,5 @@
 package com.generic.khatabook.entity;
 
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "customers")
@@ -19,15 +22,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
     private String customerId;
     private String khatabookId;
     private String msisdn;
     private String firstName;
     private String lastName;
-    @Embedded
-    private GenerationDate generationDate;
+    @CreationTimestamp
+    private LocalDateTime createdOn;
+    @UpdateTimestamp
+    private LocalDateTime updatedOn;
+    private LocalDateTime deletedOn;
     private String specificationId;
     private String productId;
 

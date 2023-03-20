@@ -10,7 +10,7 @@ public interface ProductClient {
     @GetExchange("/products")
     public ResponseEntity<?> getAllProducts();
 
-    @GetExchange("/product/id/{productId}")
+    @GetExchange("/product/{productId}")
     public ResponseEntity<?> getProductById(@PathVariable String productId);
 
 

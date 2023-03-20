@@ -12,6 +12,7 @@
     <groupId>com.generic.khatabook</groupId>
     <artifactId>errorframework</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <name>Error framework</name>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

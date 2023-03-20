@@ -2,11 +2,15 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/../../IdeaProjects/Dairy/errorframework/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../IdeaProjects/Dairy/errorframework/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Liquidbook/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Liquidbook/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Specification/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Specification/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/errorframework/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/errorframework/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/khatabook/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/khatabook/src/main/resources" charset="UTF-8" />
   </component>

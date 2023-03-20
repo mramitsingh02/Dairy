@@ -3,8 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Dairy.iml" filepath="$PROJECT_DIR$/.idea/Dairy.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../IdeaProjects/Dairy/errorframework/errorframework.iml" filepath="$PROJECT_DIR$/../../IdeaProjects/Dairy/errorframework/errorframework.iml" />
-      <module fileurl="file://$PROJECT_DIR$/errorframework/errorframework (1).iml" filepath="$PROJECT_DIR$/errorframework/errorframework (1).iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/errorframework/errorframework.iml" filepath="$PROJECT_DIR$/errorframework/errorframework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../IdeaProjects/Dairy/errorframework/errorframework (1).iml" filepath="$PROJECT_DIR$/../../IdeaProjects/Dairy/errorframework/errorframework (1).iml" />
       <module fileurl="file://$PROJECT_DIR$/khatabook/khatabook.iml" filepath="$PROJECT_DIR$/khatabook/khatabook.iml" />
       <module fileurl="file://$PROJECT_DIR$/Liquidbook/liquidbook.iml" filepath="$PROJECT_DIR$/Liquidbook/liquidbook.iml" />
       <module fileurl="file://$PROJECT_DIR$/Specification/specification.iml" filepath="$PROJECT_DIR$/Specification/specification.iml" />

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "products")
 @AllArgsConstructor
@@ -20,8 +22,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public class Product {
     @Id
-    private String productId;
+    private String id;
     private String name;
-
+    private BigDecimal price;
+    private String unitOfMeasurement;
 
 }

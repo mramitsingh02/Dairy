@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BinaryOperator;
 
@@ -39,32 +40,31 @@ public class PaymentServiceImpl implements PaymentService {
 
     private PaymentStatistics getPaymentStatistics(final Set<CustomerPayment> customersPayment) {
         BinaryOperator<AmountDTO> addAmount = AmountMapper::add;
-        final AmountDTO totalCredited = customersPayment.stream()
-                .filter(x -> x.getPaymentType().equals(PaymentType.CREDIT.name()))
-                .map(CustomerPayment::getAmount)
-                .map(AmountMapper::dto)
-                .reduce(AmountDTO.ZERO, addAmount);
+        final AmountDTO totalCredited = customersPayment.stream().filter(this::isCreditRecord).map(CustomerPayment::getAmount).map(AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
 
-        final AmountDTO totalDebited = customersPayment.stream()
-                .filter(x -> x.getPaymentType().equals(PaymentType.DEBIT.name()))
-                .map(CustomerPayment::getAmount)
-                .map(AmountMapper::dto)
-                .reduce(AmountDTO.ZERO, addAmount);
+        final AmountDTO totalDebited = customersPayment.stream().filter(this::isDebitRecord).map(CustomerPayment::getAmount).map(AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
         final AmountDTO total = totalCredited.minus(totalDebited);
+
+        if (customersPayment.isEmpty()) {
+            return null;
+        }
+
         return new PaymentStatistics(total, totalCredited, totalDebited);
+    }
+
+    private boolean isCreditRecord(final CustomerPayment x) {
+        return x.getPaymentType().equals(PaymentType.CREDIT.name());
+    }
+
+    private boolean isDebitRecord(final CustomerPayment x) {
+        return x.getPaymentType().equals(PaymentType.DEBIT.name());
     }
 
     @Override
     public boolean savePayment(final KhatabookDTO khatabookDTO, final CustomerDTO customerDTO, final PaymentDTO paymentDTO, final PaymentType paymentType) {
 
         log.info("Save Payment for khatabook {}", khatabookDTO.khatabookId());
-        myPaymentRepository.save(CustomerPayment.builder()
-                .khatabookId(khatabookDTO.khatabookId())
-                .customerId(customerDTO.customerId())
-                .amount(Amount.of(paymentDTO.amount().value(), paymentDTO.amount().unitOfMeasurement()))
-                .paymentType(paymentType.name())
-                .paymentOnDate(LocalDate.now(Clock.systemDefaultZone()))
-                .build());
+        myPaymentRepository.save(CustomerPayment.builder().khatabookId(khatabookDTO.khatabookId()).customerId(customerDTO.customerId()).amount(Amount.of(paymentDTO.amount().value(), paymentDTO.amount().unitOfMeasurement())).paymentType(paymentType.name()).paymentOnDate(LocalDate.now(Clock.systemDefaultZone())).build());
 
 
         return false;
@@ -74,7 +74,10 @@ public class PaymentServiceImpl implements PaymentService {
     public KhatabookPaymentSummary getPaymentDetailForCustomer(final CustomerDTO customerRequest) {
 
         final Set<CustomerPayment> allRecordForCustomer = myPaymentRepository.findByKhatabookIdAndCustomerId(customerRequest.khatabookId(), customerRequest.customerId());
-
+        if (Objects.isNull(allRecordForCustomer) || allRecordForCustomer.isEmpty()) {
+            return null;
+        }
         return new KhatabookPaymentSummary(getPaymentStatistics(allRecordForCustomer), CustomerPaymentMapper.mapToPojos(allRecordForCustomer));
+
     }
 }

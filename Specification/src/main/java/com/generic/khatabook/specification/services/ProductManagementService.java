@@ -1,6 +1,5 @@
 package com.generic.khatabook.specification.services;
 
-import com.generic.khatabook.specification.entity.Product;
 import com.generic.khatabook.specification.model.ProductDTO;
 import com.generic.khatabook.specification.model.ProductRatingDTO;
 
@@ -12,7 +11,7 @@ public interface ProductManagementService {
 
     List<ProductDTO> findProductByName(String productName);
 
-    Product saveProduct(ProductDTO product);
+    ProductDTO saveProduct(ProductDTO product);
 
     ProductDTO findProductById(String productId);
 

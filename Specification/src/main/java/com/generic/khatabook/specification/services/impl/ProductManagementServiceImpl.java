@@ -5,7 +5,7 @@ import com.generic.khatabook.specification.model.ProductDTO;
 import com.generic.khatabook.specification.model.ProductRatingDTO;
 import com.generic.khatabook.specification.repository.ProductManagementRepository;
 import com.generic.khatabook.specification.services.ProductManagementService;
-import com.generic.khatabook.specification.services.mapper.ProductManagementMapper;
+import com.generic.khatabook.specification.services.mapper.ProductMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -18,44 +18,44 @@ import java.util.List;
 public class ProductManagementServiceImpl implements ProductManagementService {
 
     private ProductManagementRepository myProductManagementRepository;
-    private ProductManagementMapper myProductManagementMapper;
+    private ProductMapper myProductMapper;
 
     @Autowired
-    public ProductManagementServiceImpl(final ProductManagementRepository thatProductManagementRepository, final ProductManagementMapper productManagementMapper) {
+    public ProductManagementServiceImpl(final ProductManagementRepository thatProductManagementRepository, final ProductMapper productMapper) {
         this.myProductManagementRepository = thatProductManagementRepository;
-        myProductManagementMapper = productManagementMapper;
+        myProductMapper = productMapper;
     }
 
 
     @Override
     public List<ProductDTO> getAllProducts() {
-        return myProductManagementMapper.mapToDTOs(myProductManagementRepository.findAll());
+        return myProductMapper.mapToDTOs(myProductManagementRepository.findAll());
     }
 
     @Override
     public List<ProductDTO> findProductByName(final String productName) {
-        return myProductManagementMapper.mapToDTOs(myProductManagementRepository.findAll(Example.of(Product.builder().name(productName).build())));
+        return myProductMapper.mapToDTOs(myProductManagementRepository.findAll(Example.of(Product.builder().name(productName).build())));
     }
 
     @Override
-    public Product saveProduct(final ProductDTO product) {
+    public ProductDTO saveProduct(final ProductDTO product) {
 
-        return myProductManagementRepository.save(myProductManagementMapper.mapToEntity(product));
+        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product)));
     }
 
     @Override
     public ProductDTO findProductById(final String productId) {
-        return myProductManagementMapper.mapToDTO(myProductManagementRepository.findById(productId).orElse(null));
+        return myProductMapper.mapToDTO(myProductManagementRepository.findById(productId).orElse(null));
     }
 
     @Override
     public void delete(final ProductDTO productDTO) {
-        myProductManagementRepository.delete(myProductManagementMapper.mapToEntity(productDTO));
+        myProductManagementRepository.delete(myProductMapper.mapToEntity(productDTO));
     }
 
     @Override
     public ProductDTO updateProduct(final ProductDTO product) {
-        return myProductManagementMapper.mapToDTO(myProductManagementRepository.save(myProductManagementMapper.mapToEntity(product)));
+        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product)));
     }
 
     @Override
