@@ -1,37 +1,46 @@
 package com.generic.khatabook.specification.services.mapper;
 
+import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.specification.entity.CustomerSpecification;
 import com.generic.khatabook.specification.model.CustomerSpecificationDTO;
+import com.generic.khatabook.specification.model.CustomerSpecificationUpdatable;
+import com.generic.khatabook.specification.model.UnitOfMeasurement;
+import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
-public class CustomerSpecificationMapper {
+@Component
+public class CustomerSpecificationMapper implements Mapper<CustomerSpecification, CustomerSpecificationDTO, CustomerSpecificationUpdatable> {
 
 
-    public CustomerSpecification mapToEntity(CustomerSpecificationDTO thatCustomerSpecification) {
-
-        return null;
+    @Override
+    public CustomerSpecification mapToEntity(final CustomerSpecificationDTO dto) {
+        return new CustomerSpecification(dto.id(), dto.name(), dto.description(), dto.version(), dto.khatabookId(), dto.customerId(), dto.specificationFor(), dto.price(), dto.unitOfMeasurement().getUnitType());
     }
 
-    public List<CustomerSpecification> mapToEntities(List<CustomerSpecificationDTO> otherCustomerSpecifications) {
-        if (Objects.isNull(otherCustomerSpecifications)) {
-            return Collections.emptyList();
+    @Override
+    public Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> mapToContainer(final CustomerSpecification customerSpecification) {
+        if (Objects.isNull(customerSpecification)) {
+            return Container.empty();
         }
-        return otherCustomerSpecifications.stream().map(this::mapToEntity).toList();
+        final CustomerSpecificationDTO dto = mapToDTO(customerSpecification);
+        return Container.of(dto, dto.updatable());
     }
 
-    public CustomerSpecificationDTO mapToDTO(CustomerSpecification thatCustomerSpecification) {
-
-        return null;
+    @Override
+    public CustomerSpecificationDTO mapToDTO(final CustomerSpecification customerSpecification) {
+        return new CustomerSpecificationDTO(customerSpecification.getId(), customerSpecification.getName(), customerSpecification.getDescription(), customerSpecification.getVersion(), customerSpecification.getKhatabookId(), customerSpecification.getCustomerId(), customerSpecification.getSpecificationFor(), customerSpecification.getPrice(), getUnitOfMeasurement(customerSpecification.getUnitOfMeasurement()));
     }
 
-    public List<CustomerSpecificationDTO> mapToDTOs(final List<CustomerSpecification> CustomerSpecifications) {
-        if (Objects.isNull(CustomerSpecifications)) {
-            return Collections.emptyList();
+
+    private UnitOfMeasurement getUnitOfMeasurement(final String dbUnitOfMeasurement) {
+        final UnitOfMeasurement dbValue;
+        for (final UnitOfMeasurement value : UnitOfMeasurement.values()) {
+            if (value.getUnitType().equals(dbUnitOfMeasurement)) {
+                return value;
+            }
         }
-        return CustomerSpecifications.stream().map(this::mapToDTO).toList();
+        return UnitOfMeasurement.NONE;
     }
 
 

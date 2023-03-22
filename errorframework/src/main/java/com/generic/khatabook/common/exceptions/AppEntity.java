@@ -7,6 +7,7 @@ public enum AppEntity {
     RATING("Rating"),
     KHATABOOK("Khatabook"),
     SPECIFICATION("Specification"),
+    CUSTOMER_SPECIFICATION("Customer Specification"),
     CUSTOMER("Customer"),
     MSISDN("Mobile");
     private String myName;
@@ -22,5 +23,9 @@ public enum AppEntity {
     @Override
     public String toString() {
         return "Entity Name='" + myName + '\'';
+    }
+
+    public AppEntity or(final AppEntity customer) {
+        return null;
     }
 }

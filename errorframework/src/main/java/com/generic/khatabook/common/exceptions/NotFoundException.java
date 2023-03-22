@@ -15,6 +15,12 @@ public class NotFoundException extends RuntimeException {
         this(appEntity, String.valueOf(id));
     }
 
+    public NotFoundException(final AppEntity khatabook, final AppEntity customer, final String khatabookId,
+                             final String customerId) {
+        super(khatabook.getName() + " " + khatabookId + " and " + customer.getName() + " " + customerId + " not " +
+                      "fount!.");
+    }
+
     public ProblemDetail get(){
         final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, super.getMessage());
         problemDetail.setTitle("Resource not found.");

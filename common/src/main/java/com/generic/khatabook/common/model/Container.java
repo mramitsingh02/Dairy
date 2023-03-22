@@ -58,6 +58,6 @@ public class Container<T, U> {
     }
 
     public boolean isPresent() {
-        return value != null;
+        return value != null || updatable != null;
     }
 }

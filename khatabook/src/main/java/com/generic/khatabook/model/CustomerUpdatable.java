@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public class CustomerUpdatable {
+public class CustomerUpdatable  {
     private String customerId;
     private String khatabookId;
     private String msisdn;

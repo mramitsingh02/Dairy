@@ -1,24 +1,33 @@
 package com.generic.khatabook.specification.entity;
 
-import jakarta.persistence.Embedded;
+import com.generic.khatabook.specification.model.UnitOfMeasurement;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "customers")
+@Table(name = "customer_specifications")
 public class CustomerSpecification {
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
+    private String name;
+    private String description;
+    //@Version
+    private int version;
+    private String customerId;
+    private String khatabookId;
+    private String specificationFor;
+    private BigDecimal price;
+    private String unitOfMeasurement;
 }
