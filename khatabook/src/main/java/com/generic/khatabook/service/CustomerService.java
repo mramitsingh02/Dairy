@@ -1,11 +1,11 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.Container;
 import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.CustomerUpdatable;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
+import com.generic.khatabook.common.model.Container;
 
 @Component
 public interface CustomerService {

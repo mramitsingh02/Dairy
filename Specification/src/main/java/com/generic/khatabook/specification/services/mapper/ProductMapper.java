@@ -23,7 +23,7 @@ public class ProductMapper {
         }
 
 
-        final ProductDTO productDTO = new ProductDTO(thatProduct.getId(), thatProduct.getName(), thatProduct.getPrice(),
+        final ProductDTO productDTO = new ProductDTO(thatProduct.getId(), thatProduct.getName(), 1, thatProduct.getPrice(),
                                                      getUnitOfMeasurement(thatProduct), 0f);
         return Container.of(productDTO, productDTO.updatable());
     }

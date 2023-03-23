@@ -9,13 +9,29 @@ public record CustomerDTO(String customerId, String khatabookId, String msisdn, 
                           String productId, String specificationId) {
     public static final String ANONYMOUS = "Anonymous";
 
+    public CustomerDTO(final String customerId, final String khatabookId, final String msisdn) {
+        this(customerId, khatabookId, msisdn, null, null, null, null);
+    }
+
 
     public CustomerDTO copyOf(final String generateId) {
-        return new CustomerDTO(generateId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.productId, this.specificationId);
+        return new CustomerDTO(generateId,
+                               this.khatabookId,
+                               this.msisdn,
+                               this.firstName,
+                               this.lastName,
+                               this.productId,
+                               this.specificationId);
     }
 
     public CustomerUpdatable updatable() {
-        return new CustomerUpdatable(this.customerId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.productId, this.specificationId);
+        return new CustomerUpdatable(this.customerId,
+                                     this.khatabookId,
+                                     this.msisdn,
+                                     this.firstName,
+                                     this.lastName,
+                                     this.productId,
+                                     this.specificationId);
     }
 
     @Override

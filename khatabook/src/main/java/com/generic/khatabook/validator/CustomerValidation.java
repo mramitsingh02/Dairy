@@ -31,9 +31,6 @@ public class CustomerValidation {
     @Autowired
     private KhatabookService myKhatabookService;
 
-    public ProblemDetail doCustomerProductValidation(CustomerDTO customerDTO) {
-        return doCustomerProductValidation(customerDTO.productId());
-    }
 
     public ProblemDetail doCustomerProductValidation(final String productId) {
         try {

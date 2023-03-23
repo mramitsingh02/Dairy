@@ -1,14 +1,13 @@
 package com.generic.khatabook.service.impl;
 
+import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.entity.Customer;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.model.Container;
 import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.CustomerUpdatable;
 import com.generic.khatabook.repository.CustomerRepository;
 import com.generic.khatabook.service.CustomerService;
-import com.generic.khatabook.service.mapper.ContainerCustomerMapper;
 import com.generic.khatabook.service.mapper.CustomerMapper;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
@@ -28,10 +27,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private CustomerRepository myCustomerRepository;
+
     @Autowired
     private CustomerMapper myCustomerMapper;
-    @Autowired
-    private ContainerCustomerMapper myContainerCustomerMapper;
 
     //Observability is the ability to measure the internal state of a system only by its external outputs
     //https://www.baeldung.com/spring-boot-3-observability
@@ -40,12 +38,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean isValid(CustomerDTO customerDTO) {
-        return myCustomerMapper.mapToPojo(myCustomerRepository.findByMsisdn(customerDTO.msisdn())) != null;
+        return myCustomerMapper.mapToDTO(myCustomerRepository.findByMsisdn(customerDTO.msisdn())) != null;
     }
 
     @Override
     public Container<CustomerDTO, CustomerUpdatable> getByCustomerId(final String customerId) {
-        return myContainerCustomerMapper.mapToPojo(myCustomerRepository.findById(customerId).orElse(null));
+        return myCustomerMapper.mapToContainer(myCustomerRepository.findById(customerId).orElse(null));
     }
 
     private CustomerDTO getObservation(final String matrixName, final Supplier<CustomerDTO> supplierTask) {
@@ -54,18 +52,18 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getByMsisdn(String msisdn) {
-        return myCustomerMapper.mapToPojo(myCustomerRepository.findByMsisdn(msisdn));
+        return myCustomerMapper.mapToDTO(myCustomerRepository.findByMsisdn(msisdn));
     }
 
     @Override
     public void create(CustomerDTO customerDTO) {
-        myCustomerRepository.save(myCustomerMapper.mapToDTO(customerDTO));
+        myCustomerRepository.save(myCustomerMapper.mapToEntity(customerDTO));
 
     }
 
     @Override
     public CustomerDTO update(CustomerDTO customerDTO) {
-        return myCustomerMapper.mapToPojo(myCustomerRepository.save(myCustomerMapper.mapToDTO(customerDTO)));
+        return myCustomerMapper.mapToDTO(myCustomerRepository.save(myCustomerMapper.mapToEntity(customerDTO)));
     }
 
     @Override
@@ -78,17 +76,17 @@ public class CustomerServiceImpl implements CustomerService {
         }
         myCustomerRepository.delete(customer);
 
-        return myCustomerMapper.mapToPojo(customer);
+        return myCustomerMapper.mapToDTO(customer);
     }
 
     @Override
     public Set<CustomerDTO> getAll(final String khatabookId) {
-        return myCustomerRepository.findByKhatabookId(khatabookId).stream().map(myCustomerMapper::mapToPojo).collect(Collectors.toSet());
+        return myCustomerRepository.findByKhatabookId(khatabookId).stream().map(myCustomerMapper::mapToDTO).collect(Collectors.toSet());
     }
 
     @Override
     public CustomerDTO getCustomerByMsisdn(final String khatabookId, final String msisdn) {
-        return myCustomerMapper.mapToPojo(myCustomerRepository.findByKhatabookIdAndMsisdn(khatabookId, msisdn));
+        return myCustomerMapper.mapToDTO(myCustomerRepository.findByKhatabookIdAndMsisdn(khatabookId, msisdn));
     }
 
 }

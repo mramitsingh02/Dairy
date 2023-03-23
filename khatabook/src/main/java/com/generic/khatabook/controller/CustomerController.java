@@ -36,6 +36,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -224,7 +225,7 @@ public class CustomerController {
 
         for (final Map.Entry<String, Object> member : customerEntities.entrySet()) {
             final Field field = ReflectionUtils.findField(CustomerUpdatable.class, member.getKey());
-            if (Objects.nonNull(field)) {
+            if (nonNull(field)) {
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, customerDetails, member.getValue());
             } else {
@@ -232,9 +233,11 @@ public class CustomerController {
             }
         }
 
-        final ProblemDetail customerProductValidation = myCustomerValidation.doCustomerProductValidation(customerDetails.getProductId());
-        if (Objects.nonNull(customerProductValidation)) {
-            return ResponseEntity.of(customerProductValidation).build();
+        if (nonNull(customerDetails.getProductId())) {
+            final ProblemDetail customerProductValidation = myCustomerValidation.doCustomerProductValidation(customerDetails.getProductId());
+            if (nonNull(customerProductValidation)) {
+                return ResponseEntity.of(customerProductValidation).build();
+            }
         }
 
         final CustomerDTO updateCustomer = myCustomerService.update(customerDetails.build());

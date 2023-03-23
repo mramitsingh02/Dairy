@@ -10,13 +10,7 @@ import java.util.List;
 @Repository
 @Transactional
 public interface CustomerRepository extends JpaRepository<Customer, String> {
-//    Customer existsByMsisdn(String msisdn);
-
     Customer findByMsisdn(String msisdn);
-
-//    Customer findByCustomerId(String customerId);
-//
-//    Customer findByKhatabookIdAndCustomerId(String khatabookId, String customerId);
 
     Customer findByKhatabookIdAndMsisdn(String khatabookId, String msisdn);
 

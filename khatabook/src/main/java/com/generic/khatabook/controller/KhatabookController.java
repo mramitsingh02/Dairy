@@ -1,6 +1,8 @@
 package com.generic.khatabook.controller;
 
+import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.KhatabookDTO;
+import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.IdGeneratorService;
 import com.generic.khatabook.service.KhatabookService;
 import lombok.val;
@@ -24,6 +26,8 @@ public class KhatabookController {
     @Autowired
     private KhatabookService myKhatabookService;
     @Autowired
+    private CustomerService myCustomerService;
+    @Autowired
     private IdGeneratorService myIdGeneratorService;
 
     @GetMapping("/khatabook/khatabooks")
@@ -37,7 +41,12 @@ public class KhatabookController {
         val khatabookRequest = khatabook.copyOf(myIdGeneratorService.generateId());
 
         if (!myKhatabookService.isValid(khatabookRequest)) {
+
+            if (myCustomerService.getByCustomerId(khatabook.msisdn()).isAbsent()) {
+                myCustomerService.create(new CustomerDTO("self", khatabookRequest.khatabookId(), khatabook.msisdn()));
+            }
             myKhatabookService.create(khatabookRequest);
+
             return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/khatabookId/{khatabookId}").buildAndExpand(khatabookRequest.khatabookId()).toUri()).body(khatabookRequest);
         } else {
             return ResponseEntity.badRequest().body(khatabook);

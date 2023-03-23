@@ -8,13 +8,14 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 public class ProductUpdatable {
-    String id;
-    String name;
+    private String id;
+    private String name;
+    private int quantity;
     private BigDecimal price;
     private UnitOfMeasurement unitOfMeasurement;
     private float rating;
 
     public ProductDTO build() {
-        return new ProductDTO(this.id, this.name, this.price, this.unitOfMeasurement,rating);
+        return new ProductDTO(this.id, this.name, quantity, this.price, this.unitOfMeasurement, rating);
     }
 }

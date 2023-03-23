@@ -56,7 +56,9 @@ public class Container<T, U> {
     public T ifPreset() {
         return value;
     }
-
+    public boolean isAbsent() {
+        return !isPresent();
+    }
     public boolean isPresent() {
         return value != null || updatable != null;
     }

@@ -2,6 +2,7 @@ package com.generic.khatabook.specification.services;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
+import com.generic.khatabook.specification.model.CustomerProductSpecificationUpdatable;
 import com.generic.khatabook.specification.model.CustomerSpecificationDTO;
 import com.generic.khatabook.specification.model.CustomerSpecificationUpdatable;
 import com.generic.khatabook.specification.repository.CustomerSpecificationRepository;
@@ -27,6 +28,28 @@ public class CustomerSpecificationServiceImpl implements CustomerSpecificationSe
     }
 
     @Override
+    public Containers<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getCustomerSpecification(final String khatabookId,
+                                                                                                         final String customerId) {
+        return myMapper.mapToContainers(myCustomerSpecificationRepository.findByKhatabookIdAndCustomerId(khatabookId,
+                                                                                                         customerId));
+    }
+
+    @Override
+    public Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getCustomerSpecification(final String specificationId) {
+        return myMapper.mapToContainer(myCustomerSpecificationRepository.findById(specificationId).orElse(null));
+    }
+
+    @Override
+    public CustomerSpecificationDTO update(final CustomerSpecificationDTO dto) {
+        return myMapper.mapToDTO(myCustomerSpecificationRepository.save(myMapper.mapToEntity(dto)));
+    }
+
+    @Override
+    public void delete(final CustomerSpecificationDTO customerSpecificationDTO) {
+        myCustomerSpecificationRepository.delete(myMapper.mapToEntity(customerSpecificationDTO));
+    }
+
+    @Override
     public Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> get(final String id) {
         return myMapper.mapToContainer(myCustomerSpecificationRepository.findById(id).orElse(null));
     }
@@ -35,4 +58,5 @@ public class CustomerSpecificationServiceImpl implements CustomerSpecificationSe
     public CustomerSpecificationDTO save(final CustomerSpecificationDTO dto) {
         return myMapper.mapToDTO(myCustomerSpecificationRepository.save(myMapper.mapToEntity(dto)));
     }
+
 }
