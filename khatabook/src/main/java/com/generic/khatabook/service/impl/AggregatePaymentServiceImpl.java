@@ -22,7 +22,7 @@ public class AggregatePaymentServiceImpl implements AggregatePaymentService {
 
     @Override
     public void paymentAggregate(final KhatabookDTO khatabook, final CustomerDTO customer, final AggregatePaymentDTO payment) {
-        myAggregatePaymentRepository.save(myAggregatePaymentMapper.convertToEntity(payment, khatabook, customer));
+        myAggregatePaymentRepository.save(myAggregatePaymentMapper.mapToEntity(payment, customer));
     }
 
     @Override
@@ -31,6 +31,6 @@ public class AggregatePaymentServiceImpl implements AggregatePaymentService {
                 .customerId(customer.customerId())
                 .build())).orElse(null);
         assert entity != null;
-        return myAggregatePaymentMapper.convertToDTO(entity);
+        return myAggregatePaymentMapper.mapToDTO(entity);
     }
 }

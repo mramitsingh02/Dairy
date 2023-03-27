@@ -1,19 +1,10 @@
 package com.generic.khatabook.common.model;
 
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
-public class Container<T, U> {
+public record Container<T, U>(T value, U updatable) {
 
     private static final Container<?, ?> EMPTY = new Container<>(null, null);
-
-    private final T value;
-    private final U updatable;
-
-    private Container(T value, U updatable) {
-        this.value = value;
-        this.updatable = updatable;
-    }
 
     public static <T, U> Container<T, U> empty() {
         @SuppressWarnings("unchecked") Container<T, U> t = (Container<T, U>) EMPTY;
@@ -21,44 +12,38 @@ public class Container<T, U> {
     }
 
     public static <T, U> Container<T, U> of(T value) {
-        return new Container<>(Objects.requireNonNull(value), null);
+        return new Container<>(requireNonNull(value), null);
     }
 
 
     public static <T, U> Container<T, U> ofNullable(T value) {
-        return value == null ? (Container<T, U>) EMPTY : new Container<>(value, null);
+        return value == null ? Container.empty() : new Container<>(value, null);
     }
 
+
     public static <T, U> Container<T, U> of(T value, U updatable) {
-        return new Container<>(Objects.requireNonNull(value), updatable);
+        return new Container<>(requireNonNull(value), requireNonNull(updatable));
     }
 
 
     public static <T, U> Container<T, U> ofNullable(T value, U updatable) {
-        return value == null ? (Container<T, U>) EMPTY : new Container<>(value, updatable);
+        return value == null || updatable == null ? Container.empty() : new Container<>(value, updatable);
     }
 
 
     public T get() {
-        if (value == null) {
-            throw new NoSuchElementException("No value present");
-        }
         return value;
     }
 
+    @Override
     public U updatable() {
-        if (updatable == null) {
-            throw new NoSuchElementException("No value present");
-        }
         return updatable;
     }
 
-    public T ifPreset() {
-        return value;
-    }
     public boolean isAbsent() {
         return !isPresent();
     }
+
     public boolean isPresent() {
         return value != null || updatable != null;
     }

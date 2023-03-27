@@ -92,7 +92,7 @@ public class CustomerController {
 
 
         val customer = customerDTO.copyOf(myIdGeneratorService.generateId());
-        myCustomerService.create(customer);
+        myCustomerService.saveAndUpdate(customer);
         EntityModel<CustomerDTO> entityModel = EntityModel.of(customer);
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByCustomerId(khatabookId, customer.customerId())).withSelfRel());
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByMsisdn(khatabookId, customer.msisdn())).withSelfRel());
@@ -240,7 +240,7 @@ public class CustomerController {
             }
         }
 
-        final CustomerDTO updateCustomer = myCustomerService.update(customerDetails.build());
+        final CustomerDTO updateCustomer = myCustomerService.saveAndUpdate(customerDetails.build());
 
         return ResponseEntity.ok(updateCustomer);
     }

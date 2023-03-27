@@ -43,7 +43,7 @@ public class KhatabookController {
         if (!myKhatabookService.isValid(khatabookRequest)) {
 
             if (myCustomerService.getByCustomerId(khatabook.msisdn()).isAbsent()) {
-                myCustomerService.create(new CustomerDTO("self", khatabookRequest.khatabookId(), khatabook.msisdn()));
+                myCustomerService.saveAndUpdate(new CustomerDTO("self", khatabookRequest.khatabookId(), khatabook.msisdn()));
             }
             myKhatabookService.create(khatabookRequest);
 

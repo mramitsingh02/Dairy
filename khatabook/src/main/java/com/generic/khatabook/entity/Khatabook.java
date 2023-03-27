@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public class Khatabook {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private Long id;
     private String bookId;
     private String khatabookId;

@@ -15,9 +15,7 @@ public interface CustomerService {
 
     CustomerDTO getByMsisdn(String msisdn);
 
-    void create(CustomerDTO customerDTO);
-
-    CustomerDTO update(CustomerDTO customerDTO);
+    CustomerDTO saveAndUpdate(CustomerDTO customerDTO);
 
     CustomerDTO delete(String customerId, String msidn);
 

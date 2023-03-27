@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @Table(name = "specifications")
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Builder
+@Data
 @DynamicInsert
 @DynamicUpdate
 public class Specification {

@@ -1,27 +1,41 @@
 package com.generic.khatabook.service.mapper;
 
+import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.entity.AggregatePayment;
-import com.generic.khatabook.entity.TimePeriod;
 import com.generic.khatabook.model.AggregatePaymentDTO;
 import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.KhatabookDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Component
-public class AggregatePaymentMapper {
+public class AggregatePaymentMapper implements Mapper<AggregatePayment, AggregatePaymentDTO, Void> {
 
-
-    public AggregatePayment convertToEntity(final AggregatePaymentDTO dto, final KhatabookDTO khatabook, final CustomerDTO customer) {
-
-        return AggregatePayment.builder().customerId(customer.customerId()).khatabookId(khatabook.khatabookId()).timePeriod(TimePeriod.of(dto.from(), dto.to())).build();
-    }
-
-    public AggregatePaymentDTO convertToDTO(final AggregatePayment dto) {
+    @Override
+    public AggregatePayment mapToEntity(final AggregatePaymentDTO dto) {
         if (Objects.isNull(dto)) {
             return null;
         }
-        return new AggregatePaymentDTO(dto.getTimePeriod().from(), dto.getTimePeriod().to());
+        return new AggregatePayment( dto.from(), dto.to());
     }
+
+    @Override
+    public Container<AggregatePaymentDTO, Void> mapToContainer(final AggregatePayment aggregatePayment) {
+        return Container.of(mapToDTO(aggregatePayment));
+    }
+
+    @Override
+    public AggregatePaymentDTO mapToDTO(final AggregatePayment aggregatePayment) {
+        if (Objects.isNull(aggregatePayment)) {
+            return null;
+        }
+        return new AggregatePaymentDTO(aggregatePayment.getFromDate(), aggregatePayment.getToDate());
+    }
+
+    public AggregatePayment mapToEntity(final AggregatePaymentDTO dto, final CustomerDTO customer) {
+
+        return AggregatePayment.builder().customerId(customer.customerId()).khatabookId(customer.khatabookId()).fromDate(dto.from()).toDate(dto.to()).build();
+    }
+
 }
