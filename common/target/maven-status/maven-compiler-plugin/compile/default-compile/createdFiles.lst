@@ -1,1 +1,4 @@
+com\generic\khatabook\common\model\Mapper.class
 com\generic\khatabook\common\model\Container.class
+com\generic\khatabook\common\model\AppEntity.class
+com\generic\khatabook\common\model\Containers.class

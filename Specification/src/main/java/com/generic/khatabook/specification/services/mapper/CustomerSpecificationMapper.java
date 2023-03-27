@@ -1,6 +1,7 @@
 package com.generic.khatabook.specification.services.mapper;
 
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.specification.entity.CustomerProductSpecification;
 import com.generic.khatabook.specification.entity.CustomerSpecification;
 import com.generic.khatabook.specification.model.CustomerSpecificationDTO;

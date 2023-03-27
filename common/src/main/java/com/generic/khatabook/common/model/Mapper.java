@@ -27,5 +27,8 @@ public interface Mapper<ENTITY, DTO, UPDATABLE> {
         return entities.stream().map(this::mapToDTO).toList();
     }
 
+    default Containers<DTO, UPDATABLE> mapToContainers(List<ENTITY> entities) {
+        return new Containers<>(entities.stream().map(this::mapToContainer).toList());
+    }
 
 }

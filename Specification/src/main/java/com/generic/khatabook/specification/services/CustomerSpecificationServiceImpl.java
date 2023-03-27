@@ -2,7 +2,6 @@ package com.generic.khatabook.specification.services;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
-import com.generic.khatabook.specification.model.CustomerProductSpecificationUpdatable;
 import com.generic.khatabook.specification.model.CustomerSpecificationDTO;
 import com.generic.khatabook.specification.model.CustomerSpecificationUpdatable;
 import com.generic.khatabook.specification.repository.CustomerSpecificationRepository;
@@ -17,7 +16,8 @@ public class CustomerSpecificationServiceImpl implements CustomerSpecificationSe
     private CustomerSpecificationMapper myMapper;
 
     @Autowired
-    public CustomerSpecificationServiceImpl(final CustomerSpecificationRepository thatCustomerSpecificationRepository, final CustomerSpecificationMapper customerSpecificationMapper) {
+    public CustomerSpecificationServiceImpl(final CustomerSpecificationRepository thatCustomerSpecificationRepository,
+                                            final CustomerSpecificationMapper customerSpecificationMapper) {
         this.myCustomerSpecificationRepository = thatCustomerSpecificationRepository;
         myMapper = customerSpecificationMapper;
     }
