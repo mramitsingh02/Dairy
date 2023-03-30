@@ -17,7 +17,7 @@ public class AggregatePaymentMapper implements Mapper<AggregatePayment, Aggregat
         if (Objects.isNull(dto)) {
             return null;
         }
-        return new AggregatePayment( dto.from(), dto.to());
+        return new AggregatePayment(dto.from(), dto.to());
     }
 
     @Override
@@ -35,7 +35,8 @@ public class AggregatePaymentMapper implements Mapper<AggregatePayment, Aggregat
 
     public AggregatePayment mapToEntity(final AggregatePaymentDTO dto, final CustomerDTO customer) {
 
-        return AggregatePayment.builder().customerId(customer.customerId()).khatabookId(customer.khatabookId()).fromDate(dto.from()).toDate(dto.to()).build();
+        return AggregatePayment.builder().customerId(customer.customerId()).khatabookId(customer.khatabookId()).fromDate(
+                dto.from()).toDate(dto.to()).build();
     }
 
 }

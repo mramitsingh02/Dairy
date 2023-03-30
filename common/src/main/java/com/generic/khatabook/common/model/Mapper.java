@@ -1,11 +1,11 @@
 package com.generic.khatabook.common.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public interface Mapper<ENTITY, DTO, UPDATABLE> {
-
 
     ENTITY mapToEntity(DTO dto);
 
@@ -30,5 +30,16 @@ public interface Mapper<ENTITY, DTO, UPDATABLE> {
     default Containers<DTO, UPDATABLE> mapToContainers(List<ENTITY> entities) {
         return new Containers<>(entities.stream().map(this::mapToContainer).toList());
     }
+    default Containers<DTO, UPDATABLE> mapToContainers(ENTITY... entities) {
 
+        final Containers<DTO, UPDATABLE> containers = new Containers<>();
+
+
+        for (final ENTITY entity : entities) {
+
+            containers.add(mapToContainer(entity));
+        }
+
+        return containers;
+    }
 }
