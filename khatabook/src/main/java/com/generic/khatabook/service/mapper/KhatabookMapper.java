@@ -1,14 +1,26 @@
 package com.generic.khatabook.service.mapper;
 
+import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.entity.GenerationDate;
 import com.generic.khatabook.entity.Khatabook;
 import com.generic.khatabook.model.KhatabookDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KhatabookMapper {
+public class KhatabookMapper implements Mapper<Khatabook, KhatabookDTO, Void> {
 
-    public KhatabookDTO mapToPojo(Khatabook myKhatabook) {
+    @Override
+    public Khatabook mapToEntity(final KhatabookDTO khatabookDTO) {
+        return mapToEntity(khatabookDTO, GenerationDate.creation());
+    }
+
+    @Override
+    public Container<KhatabookDTO, Void> mapToContainer(final Khatabook khatabook) {
+        return null;
+    }
+
+    public KhatabookDTO mapToDTO(Khatabook myKhatabook) {
 
         if (myKhatabook == null) {
             return null;
@@ -16,7 +28,7 @@ public class KhatabookMapper {
         return new KhatabookDTO(null, myKhatabook.getBookId(), myKhatabook.getKhatabookId(), myKhatabook.getMsisdn(), myKhatabook.getPartnerName(), myKhatabook.getPartnerDescription());
     }
 
-    public Khatabook mapToDTO(KhatabookDTO myKhatabookDTO, final GenerationDate generationDate) {
+    public Khatabook mapToEntity(KhatabookDTO myKhatabookDTO, final GenerationDate generationDate) {
         if (myKhatabookDTO == null) {
             return null;
         }

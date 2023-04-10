@@ -14,9 +14,11 @@ public record CustomerDTO(String customerId,
                           String specificationId) {
     public static final String ANONYMOUS = "Anonymous";
 
+
     public CustomerDTO(final String customerId, final String khatabookId, final String msisdn) {
         this(customerId, khatabookId, msisdn, null, null, null, null);
     }
+
 
     public static CustomerDTO of(String customerId,
                                  String khatabookId,
@@ -28,6 +30,9 @@ public record CustomerDTO(String customerId,
         return new CustomerDTO(customerId, khatabookId, msisdn, firstName, lastName, productId, specificationId);
     }
 
+    public static CustomerDTO of(final String customerId, final String khatabookId, final String msisdn) {
+        return new CustomerDTO(customerId, khatabookId, msisdn);
+    }
 
     public CustomerDTO copyOf(final String generateId) {
         return new CustomerDTO(generateId,
@@ -49,18 +54,32 @@ public record CustomerDTO(String customerId,
                                      this.specificationId);
     }
 
+
     @Override
     public String toString() {
 
-        if (Objects.isNull(firstName) || Objects.isNull(lastName)) {
-            return ANONYMOUS + "user with " + msisdn + "" + "and customer id " + customerId + " belong to " + khatabookId + ".";
+        String fullName;
+        String msisdnDetail = "with %s".formatted(msisdn);
+        String custDetail = null;
 
+
+        if (Objects.isNull(firstName) || Objects.isNull(lastName)) {
+            fullName = "%s %s".formatted(ANONYMOUS, "user");
+        } else {
+            fullName = "%s %s".formatted(firstName, lastName);
+        }
+        if (Objects.nonNull(customerId)) {
+            custDetail = "and customer id %s".formatted(customerId);
         }
 
-        return firstName + " " + lastName + " with " + msisdn + "and" + " customer id " + customerId + " belong to " + khatabookId + ".";
-
+        final String khatabookDetail = "belong to %s".formatted(khatabookId);
+        if (Objects.isNull(custDetail)) {
+            return "%s %s %s.".formatted(fullName, msisdnDetail, khatabookDetail);
+        }
+        return "%s %s %s %s.".formatted(fullName, msisdnDetail, custDetail, khatabookDetail);
 
     }
-
-
 }
+
+
+

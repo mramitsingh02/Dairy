@@ -1,6 +1,7 @@
 package com.generic.khatabook.specification.services.mapper;
 
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.specification.entity.Product;
 import com.generic.khatabook.specification.model.ProductDTO;
 import com.generic.khatabook.specification.model.ProductUpdatable;
@@ -12,26 +13,34 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class ProductMapper {
-    public Product mapToEntity(ProductDTO otherProduct) {
-        return Product.builder().id(otherProduct.id()).name(otherProduct.name()).price(otherProduct.price()).unitOfMeasurement(otherProduct.unitOfMeasurement().getUnitType()).build();
+public class ProductMapper implements Mapper<Product, ProductDTO, ProductUpdatable> {
+    public Product mapToEntity(ProductDTO dto) {
+        return Product.builder().id(dto.id()).name(dto.name()).price(dto.price()).unitOfMeasurement(
+                dto.unitOfMeasurement().getUnitType()).build();
     }
 
-    public Container<ProductDTO, ProductUpdatable> mapToDTO(Product thatProduct) {
-        if (Objects.isNull(thatProduct)) {
+    @Override
+    public Container<ProductDTO, ProductUpdatable> mapToContainer(final Product product) {
+
+        if (Objects.isNull(product)) {
             return Container.empty();
         }
 
-
-        final ProductDTO productDTO = new ProductDTO(thatProduct.getId(), thatProduct.getName(), 1, thatProduct.getPrice(),
-                                                     getUnitOfMeasurement(thatProduct), 0f);
+        final ProductDTO productDTO = mapToDTO(product);
         return Container.of(productDTO, productDTO.updatable());
     }
 
-    private UnitOfMeasurement getUnitOfMeasurement(final Product thatProduct) {
+
+    @Override
+    public ProductDTO mapToDTO(final Product product) {
+        return new ProductDTO(product.getId(), product.getName(), product.getQuantity(), product.getPrice(),
+                              getUnitOfMeasurement(product), 0f);
+    }
+
+    private UnitOfMeasurement getUnitOfMeasurement(final Product product) {
         final UnitOfMeasurement dbValue;
         for (final UnitOfMeasurement value : UnitOfMeasurement.values()) {
-            if (value.getUnitType().equals(thatProduct.getUnitOfMeasurement())) {
+            if (value.getUnitType().equals(product.getUnitOfMeasurement())) {
                 return value;
             }
         }
@@ -45,10 +54,5 @@ public class ProductMapper {
         return products.stream().map(this::mapToEntity).toList();
     }
 
-    public List<ProductDTO> mapToDTOs(final List<Product> products) {
-        if (Objects.isNull(products)) {
-            return Collections.emptyList();
-        }
-        return products.stream().map(this::mapToDTO).map(Container::get).toList();
-    }
+
 }

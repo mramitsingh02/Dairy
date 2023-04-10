@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,21 +33,21 @@ public class KhatabookServiceImpl implements KhatabookService {
 
     @Override
     public KhatabookDTO get(final String msisdn) {
-        return myKhatabookMapper.mapToPojo(myKhatabookRepository.findByMsisdn(msisdn).orElse(null));
+        return myKhatabookMapper.mapToDTO(myKhatabookRepository.findByMsisdn(msisdn).orElse(null));
     }
 
     @Override
     public void create(final KhatabookDTO khatabookDTO) {
 
         log.info("Khatabook {} created.", khatabookDTO.khatabookId());
-        myKhatabookRepository.save(myKhatabookMapper.mapToDTO(khatabookDTO, new GenerationDate(LocalDateTime.now(Clock.systemDefaultZone()))));
+        myKhatabookRepository.save(myKhatabookMapper.mapToEntity(khatabookDTO, GenerationDate.creation()));
         log.info("Khatabook {} successful created.", khatabookDTO.khatabookId());
     }
 
     @Override
     public KhatabookDTO update(final KhatabookDTO khatabookDTO) {
         log.info("Khatabook {} created.", khatabookDTO.khatabookId());
-        myKhatabookRepository.save(myKhatabookMapper.mapToDTO(khatabookDTO, new GenerationDate(null, LocalDateTime.now(Clock.systemDefaultZone()))));
+        myKhatabookRepository.save(myKhatabookMapper.mapToEntity(khatabookDTO, GenerationDate.modification()));
 
         log.info("Khatabook {} successful created.", khatabookDTO.khatabookId());
         return getKhatabookByKhatabookId(khatabookDTO.khatabookId());
@@ -59,30 +57,35 @@ public class KhatabookServiceImpl implements KhatabookService {
     public KhatabookDTO delete(final String khatabookId, final String msisdn) {
         Khatabook customer;
         if (isNull(khatabookId) && isNull(msisdn)) {
-            final Khatabook foundLastKhatabook = myKhatabookRepository.findAll().stream().sorted(Comparator.comparing(Khatabook::getCreatedOn)).findFirst().orElseThrow(() -> new IllegalArgumentException("all value is deleted"));
+            final Khatabook foundLastKhatabook = myKhatabookRepository.findAll().stream().sorted(Comparator.comparing(
+                    Khatabook::getCreatedOn)).findFirst().orElseThrow(() -> new IllegalArgumentException(
+                    "all value is deleted"));
             myKhatabookRepository.delete(foundLastKhatabook);
-            return myKhatabookMapper.mapToPojo(foundLastKhatabook);
+            return myKhatabookMapper.mapToDTO(foundLastKhatabook);
         }
 
         if (khatabookId != null) {
-            customer = myKhatabookRepository.findByKhatabookId(khatabookId).orElseThrow(() -> new NotFoundException(AppEntity.KHATABOOK, khatabookId));
+            customer = myKhatabookRepository.findByKhatabookId(khatabookId).orElseThrow(() -> new NotFoundException(
+                    AppEntity.KHATABOOK,
+                    khatabookId));
         } else {
             customer = myKhatabookRepository.findByMsisdn(msisdn).orElse(null);
         }
         myKhatabookRepository.delete(customer);
 
-        return myKhatabookMapper.mapToPojo(customer);
+        return myKhatabookMapper.mapToDTO(customer);
     }
 
     @Override
     public List<KhatabookDTO> getAll() {
 
-        return myKhatabookRepository.findAll().stream().map(myKhatabookMapper::mapToPojo).toList();
+        return myKhatabookRepository.findAll().stream().map(myKhatabookMapper::mapToDTO).toList();
     }
 
     @Override
     public KhatabookDTO getKhatabookByKhatabookId(final String khatabookId) {
-        final Khatabook myKhatabook = myKhatabookRepository.findByKhatabookId(khatabookId).stream().findFirst().orElse(null);
-        return myKhatabookMapper.mapToPojo(myKhatabook);
+        final Khatabook myKhatabook = myKhatabookRepository.findByKhatabookId(khatabookId).stream().findFirst().orElse(
+                null);
+        return myKhatabookMapper.mapToDTO(myKhatabook);
     }
 }

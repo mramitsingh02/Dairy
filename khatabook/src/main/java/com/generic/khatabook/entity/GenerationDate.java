@@ -35,6 +35,14 @@ public class GenerationDate {
         this(createdOn, updateOn, null);
     }
 
+    public static GenerationDate creation() {
+        return new GenerationDate(LocalDateTime.now(Clock.systemDefaultZone()));
+    }
+
+    public static GenerationDate modification() {
+        return new GenerationDate(null, LocalDateTime.now(Clock.systemDefaultZone()));
+    }
+
     public LocalDateTime createdOn() {
         return createdOn;
     }

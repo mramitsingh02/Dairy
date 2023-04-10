@@ -42,12 +42,12 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     public ProductDTO saveProduct(final ProductDTO product) {
 
-        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product))).get();
+        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product)));
     }
 
     @Override
     public Container<ProductDTO, ProductUpdatable> findProductById(final String productId) {
-        return myProductMapper.mapToDTO(myProductManagementRepository.findById(productId).orElse(null));
+        return myProductMapper.mapToContainer(myProductManagementRepository.findById(productId).orElse(null));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
 
     @Override
     public ProductDTO updateProduct(final ProductDTO product) {
-        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product))).get();
+        return myProductMapper.mapToDTO(myProductManagementRepository.save(myProductMapper.mapToEntity(product)));
     }
 
     @Override
