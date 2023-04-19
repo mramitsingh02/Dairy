@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Entity
 @Data
@@ -30,6 +31,11 @@ public class CustomerProductSpecification {
     @ManyToOne
     @JoinColumn(name = "customerProductId")
     CustomerSpecification customerSpecification;
+
+    private BigDecimal price;
+    private long start;
+    private long end;
+    private String unitOfMeasurement;
 
     @CreationTimestamp
     private LocalDateTime createdOn;

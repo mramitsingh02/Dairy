@@ -43,7 +43,7 @@ public class ProductManagementController {
 
 
     @GetMapping(path = "/products")
-    public ResponseEntity<?> getAllProducts() {
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
 
         return ResponseEntity.ok(myProductManagementService.getAllProducts());
     }
@@ -85,7 +85,7 @@ public class ProductManagementController {
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<?> getProductById(@PathVariable String productId) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable String productId) {
         final ProductDTO entityModel = myProductManagementService.findProductById(productId).get();
         if (Objects.isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productId).get()).build();
@@ -95,7 +95,7 @@ public class ProductManagementController {
     }
 
     @DeleteMapping("/product/{productId}")
-    public ResponseEntity<?> deleteProductById(@PathVariable String productId) {
+    public ResponseEntity<ProductDTO> deleteProductById(@PathVariable String productId) {
         final ProductDTO entityModel = myProductManagementService.findProductById(productId).get();
         if (Objects.isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productId).get()).build();

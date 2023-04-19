@@ -3,10 +3,14 @@ package com.generic.khatabook.repository;
 import com.generic.khatabook.entity.CustomerPayment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 public interface PaymentRepository extends JpaRepository<CustomerPayment, Long> {
-    Set<CustomerPayment> findByKhatabookId(String khatabookId);
+    List<CustomerPayment> findByKhatabookId(String khatabookId);
 
-    Set<CustomerPayment> findByKhatabookIdAndCustomerId(String khatabookId, String customerId);
+    List<CustomerPayment> findByKhatabookIdAndCustomerId(String khatabookId, String customerId);
+    /*List<CustomerPayment> findByKhatabookIdAndCustomerIdAndPaymentOnDateBetween(String khatabookId, String customerId
+            , LocalDateTime startDate, LocalDateTime endDate);*/
 }

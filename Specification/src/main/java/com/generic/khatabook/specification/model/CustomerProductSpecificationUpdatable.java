@@ -9,9 +9,11 @@ public class CustomerProductSpecificationUpdatable {
     private Long id;
     private String productId;
     private float quantity;
+    private UnitOfValue unitOfValue;
+    private UnitOfMeasurement unitOfMeasurement;
 
     public CustomerProductSpecificationDTO build() {
-        return new CustomerProductSpecificationDTO(this.id, this.productId, this.quantity);
+        return new CustomerProductSpecificationDTO(this.id, this.productId, this.quantity, unitOfValue, unitOfMeasurement);
     }
 
 }

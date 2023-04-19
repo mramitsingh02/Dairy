@@ -115,7 +115,7 @@ public class CustomerSpecificationController {
     }
 
     @GetMapping("/khatabook/{khatabookId}/customer/{customerId}/specification/{specificationId}")
-    public ResponseEntity<?> getById(@PathVariable String khatabookId,
+    public ResponseEntity<CustomerSpecificationDTO> getById(@PathVariable String khatabookId,
                                      @PathVariable String customerId,
                                      @PathVariable String specificationId) {
 
@@ -212,9 +212,8 @@ public class CustomerSpecificationController {
                 if (Objects.isNull(oldProductSpecification.getId())) {
                     entityModel.addProduct(oldProductSpecification);
                 }
-                return entityModel;
             }
-
+            return entityModel;
 
         }
         return null;

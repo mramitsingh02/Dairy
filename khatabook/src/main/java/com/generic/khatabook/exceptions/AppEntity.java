@@ -8,7 +8,8 @@ public enum AppEntity {
     KHATABOOK("Khatabook"),
     SPECIFICATION("Specification"),
     CUSTOMER("Customer"),
-    MSISDN("Mobile");
+    MSISDN("Mobile"),
+    AMOUNT("Amount");
     private String myName;
 
     AppEntity(final String name) {

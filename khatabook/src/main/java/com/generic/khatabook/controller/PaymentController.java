@@ -1,6 +1,7 @@
 package com.generic.khatabook.controller;
 
 import com.generic.khatabook.exceptions.AppEntity;
+import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.PaymentDTO;
 import com.generic.khatabook.model.PaymentType;
@@ -35,7 +36,8 @@ public class PaymentController {
     private IdGeneratorService myIdGeneratorService;
 
     @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/pay")
-    public ResponseEntity<?> gavenToCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody PaymentDTO payment) {
+    public ResponseEntity<?> gavenToCustomer(@PathVariable String khatabookId, @PathVariable String customerId,
+                                             @RequestBody PaymentDTO payment) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
@@ -45,16 +47,24 @@ public class PaymentController {
         final var customer = myCustomerService.getByCustomerId(customerId);
 
         if (Objects.isNull(customer)) {
-             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
-        myPaymentService.savePayment(khatabook, customer.get(), payment, PaymentType.CREDIT);
+
+        try {
+            myPaymentService.savePayment(khatabook, customer.get(), payment, PaymentType.CREDIT);
+        } catch (InvalidArgumentValueException e) {
+
+            return ResponseEntity.of(e.get()).build();
+        }
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}/pay")
-    public ResponseEntity<?> gavenToCustomerByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn, @RequestBody PaymentDTO payment) {
+    public ResponseEntity<?> gavenToCustomerByMsisdn(@PathVariable String khatabookId,
+                                                     @PathVariable String msisdn,
+                                                     @RequestBody PaymentDTO payment) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
@@ -72,17 +82,17 @@ public class PaymentController {
     }
 
     @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/receive")
-    public ResponseEntity<?> receiveFromCustomer(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody PaymentDTO payment) {
-
+    public ResponseEntity<?> receiveFromCustomer(@PathVariable String khatabookId,
+                                                 @PathVariable String customerId,
+                                                 @RequestBody PaymentDTO payment) {
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
-
         final var customer = myCustomerService.getByCustomerId(payment.from());
         if (Objects.isNull(customer)) {
-             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         myPaymentService.savePayment(khatabook, customer.get(), payment, PaymentType.DEBIT);
 
@@ -90,7 +100,9 @@ public class PaymentController {
     }
 
     @PostMapping(path = "/khatabook/{khatabookId}/msisdn/{msisdn}/receive")
-    public ResponseEntity<?> receiveFromCustomerByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn, @RequestBody PaymentDTO payment) {
+    public ResponseEntity<?> receiveFromCustomerByMsisdn(@PathVariable String khatabookId,
+                                                         @PathVariable String msisdn,
+                                                         @RequestBody PaymentDTO payment) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
         if (Objects.isNull(khatabook)) {

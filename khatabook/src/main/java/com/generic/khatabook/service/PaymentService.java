@@ -12,4 +12,7 @@ public interface PaymentService {
     boolean savePayment(KhatabookDTO khatabookDTO, CustomerDTO customerDTO, PaymentDTO paymentDTO, final PaymentType paymentType);
 
     KhatabookPaymentSummary getPaymentDetailForCustomer(CustomerDTO customerRequest);
+    KhatabookPaymentSummary getPaymentDetailForCustomer(CustomerDTO customerRequest,
+                                                        final String sorting,
+                                                        final String sortingBy);
 }

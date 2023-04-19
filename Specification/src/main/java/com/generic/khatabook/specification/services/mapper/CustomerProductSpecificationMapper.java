@@ -3,8 +3,11 @@ package com.generic.khatabook.specification.services.mapper;
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.specification.entity.CustomerProductSpecification;
+import com.generic.khatabook.specification.entity.Product;
 import com.generic.khatabook.specification.model.CustomerProductSpecificationDTO;
 import com.generic.khatabook.specification.model.CustomerProductSpecificationUpdatable;
+import com.generic.khatabook.specification.model.UnitOfMeasurement;
+import com.generic.khatabook.specification.model.UnitOfValue;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -18,9 +21,22 @@ public class CustomerProductSpecificationMapper implements Mapper<CustomerProduc
 
     @Override
     public CustomerProductSpecificationDTO mapToDTO(final CustomerProductSpecification entity) {
-        return new CustomerProductSpecificationDTO(entity.getId(), entity.getProductId(), entity.getQuantity());
+        return new CustomerProductSpecificationDTO(entity.getId(), entity.getProductId(), entity.getQuantity(),
+                                                   new UnitOfValue(entity.getPrice(), entity.getStart(),
+                                                                   entity.getEnd()),
+                                                   getUnitOfMeasurement(entity.getUnitOfMeasurement())
+                                                   );
     }
 
+    private UnitOfMeasurement getUnitOfMeasurement(final String unitOfMeasurment) {
+        final UnitOfMeasurement dbValue;
+        for (final UnitOfMeasurement value : UnitOfMeasurement.values()) {
+            if (value.getUnitType().equals(unitOfMeasurment)) {
+                return value;
+            }
+        }
+        return UnitOfMeasurement.NONE;
+    }
     @Override
     public Container<CustomerProductSpecificationDTO, CustomerProductSpecificationUpdatable> mapToContainer(final CustomerProductSpecification entity) {
 

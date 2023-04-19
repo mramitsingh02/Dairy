@@ -43,7 +43,7 @@ public class CustomerSpecificationUpdatable {
         if (Objects.isNull(products)) {
             return null;
         }
-        return products.stream().filter(x -> x.getProductId().equals(productId)).findFirst().orElse(new CustomerProductSpecificationUpdatable(null, productId, 1));
+        return products.stream().filter(x -> x.getProductId().equals(productId)).findFirst().orElse(new CustomerProductSpecificationUpdatable(null, productId, 1, UnitOfValue.non(), UnitOfMeasurement.NONE));
     }
 
     public void addProduct(final CustomerProductSpecificationUpdatable customerProductSpecificationUpdatable) {

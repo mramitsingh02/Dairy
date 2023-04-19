@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "customer_payment")
+@Table(name = "customer_payment_aggregated")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CustomerPayment {
+public class CustomerPaymentAggregated {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
