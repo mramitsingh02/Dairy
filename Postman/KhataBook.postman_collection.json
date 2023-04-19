@@ -1,0 +1,639 @@
+{
+	"info": {
+		"_postman_id": "17058ac5-e4f0-40e9-bf3e-ca5f0cd72305",
+		"name": "KhataBook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CreateKatabook",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"khatabookId\", jsonData.khatabookId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"khatabookId\": \"Khatabook{{$randomInt}}\",\r\n    \"msisdn\": \"{{$randomPhoneNumber}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/khatabook",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"khatabook"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetKhatabookAll",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/khatabook/khatabooks",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"khatabooks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Customer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"customerId\", jsonData.customerId);\r",
+							"pm.environment.set(\"msisdn\", jsonData.msisdn);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"khatabookId\": \"{{khatabookId}}\",\r\n    \"msisdn\": \"{{$randomPhoneNumber}}\",\r\n    \"firstName\": \"{{$randomFirstName}}\",\r\n    \"lastName\": \"{{$randomLastName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCustomersByKhatabook",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customers",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetKhatabookForCustomer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetKhatabookForCustomerByMsisdn",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/msisdn/{{msisdn}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"msisdn",
+						"{{msisdn}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PayToCustomer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"to\":\"{{customerId}}\",\r\n     \"amount\": {\r\n        \"value\": {{$randomInt}},\r\n        \"unitOfMeasurement\": \"USD\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}/pay",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RecievFromCustomer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"from\": \"{{customerId}}\",\r\n    \"amount\": {\r\n        \"value\": 4270,\r\n        \"unitOfMeasurement\": \"USD\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}/receive",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}",
+						"receive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "HelloWorld",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/hello-world",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"hello-world"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Khatabook Access",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/khatabook/khatabook/khatabookId/{{khatabookId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"khatabook",
+						"khatabookId",
+						"{{khatabookId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "KhatabookSummary",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customers",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteKatabook",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"khatabookId\", jsonData.khatabookId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"khatabookId\": \"Amit_{{$randomInt}}\",\r\n    \"msisdn\": \"{{$randomPhoneNumber}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/khatabook/",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"khatabook",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "aggregatePayment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"from\": \"2022-03-30\",\r\n    \"to\": \"2023-04-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}/aggregate",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}",
+						"aggregate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "KhatabookMetrics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/actuator/metrics/getByCustomerId",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"actuator",
+						"metrics",
+						"getByCustomerId"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateCustomer",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"productId\": \"12ebb2bc-017f-4706-a781-270bb8c785e5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateProuctForSelf",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"productId\": \"a44c684b-a309-4e71-9168-683b1b865f43\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/self",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"self"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateCustomerSpecification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"custSpecificationId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\":\"{{$guid}}\",\r\n  \"name\":\"{{$randomFullName}}\",\r\n  \"description\": \"{{$randomWords}}\",\r\n  \"products\": [\r\n        {\r\n            \"productId\": \"12ebb2bc-017f-4706-a781-270bb8c785e5\",\r\n            \"quantity\": 2.0\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}/specification",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}",
+						"specification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateCustomerSpecification",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"products\": [\r\n        {\r\n            \"productId\": \"12ebb2bc-017f-4706-a781-270bb8c785e5\",\r\n            \"quantity\": 2.0\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product/78d32bb9-45bf-46ce-b5b7-7d036a4c53c0",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product",
+						"78d32bb9-45bf-46ce-b5b7-7d036a4c53c0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCustomerSpecification",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{S_URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}/specification/{{custSpecificationId}}",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}",
+						"specification",
+						"{{custSpecificationId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PayToCustomerForMilkProd",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"to\":\"{{customerId}}\",\r\n     \"productId\": \"12ebb2bc-017f-4706-a781-270bb8c785e5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/khatabook/{{khatabookId}}/customer/{{customerId}}/pay",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"khatabook",
+						"{{khatabookId}}",
+						"customer",
+						"{{customerId}}",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

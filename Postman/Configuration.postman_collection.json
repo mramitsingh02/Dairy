@@ -1,0 +1,319 @@
+{
+	"info": {
+		"_postman_id": "3a555a8c-5dda-4ede-a731-e6ca8aff0099",
+		"name": "Configuration",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CreateSpecification",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"specificationId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\":\"{{$guid}}\",\r\n  \"name\":\"{{$randomFullName}}\",\r\n  \"description\": \"{{$randomWords}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/specification",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"specification"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Specifications",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{S_URL}}/specifications",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"specifications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Specification",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{S_URL}}/specification/5ace44c4-239e-4382-a5ca-5af3d64ed994",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"specification",
+						"5ace44c4-239e-4382-a5ca-5af3d64ed994"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetProducts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{S_URL}}/products",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"productId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":\"{{$guid}}\",\r\n    \"name\": \"{{$randomProductName}}\",\r\n    \"price\": {{$randomPrice}},\r\n    \"unitOfMeasurement\": \"KILOGRAM\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteProduct",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"6236b60e-2d4c-45b6-ba07-24961f1f650e\",\r\n    \"name\": \"Eduardo Yost\",\r\n    \"description\": \"panel Wooden\",\r\n    \"createdOn\": \"2023-03-17T00:09:15.636927\",\r\n    \"updatedOn\": \"2024-03-17T00:09:15.636927\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product/4cf79171-4c78-4085-be29-028f2ffc8e1f",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product",
+						"4cf79171-4c78-4085-be29-028f2ffc8e1f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ProductRating",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n     \"productId\" :\"{{productId}}\",\r\n     \"rating\":5,\r\n     \"description\": \"Tesing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product/id/{{productId}}/rating",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product",
+						"id",
+						"{{productId}}",
+						"rating"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateSpecification",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"6236b60e-2d4c-45b6-ba07-24961f1f650e\",\r\n    \"name\": \"Eduardo Yost\",\r\n    \"description\": \"panel Wooden\",\r\n    \"createdOn\": \"2023-03-17T00:09:15.636927\",\r\n    \"updatedOn\": \"2024-03-17T00:09:15.636927\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/specification/id/{{id}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"specification",
+						"id",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetProductById",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"6236b60e-2d4c-45b6-ba07-24961f1f650e\",\r\n    \"name\": \"Eduardo Yost\",\r\n    \"description\": \"panel Wooden\",\r\n    \"createdOn\": \"2023-03-17T00:09:15.636927\",\r\n    \"updatedOn\": \"2024-03-17T00:09:15.636927\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product/78d32bb9-45bf-46ce-b5b7-7d036a4c53c0",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product",
+						"78d32bb9-45bf-46ce-b5b7-7d036a4c53c0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateProductPrice",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"price\": 54.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product/12ebb2bc-017f-4706-a781-270bb8c785e5",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product",
+						"12ebb2bc-017f-4706-a781-270bb8c785e5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Milk Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"productId\", jsonData.id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\":\"{{$guid}}\",\r\n    \"name\": \"Milk\",\r\n    \"price\": 50,\r\n    \"unitOfMeasurement\": \"LITTER\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S_URL}}/product",
+					"host": [
+						"{{S_URL}}"
+					],
+					"path": [
+						"product"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
