@@ -30,13 +30,13 @@ public class AggregatePaymentMapper implements Mapper<AggregatePayment, Aggregat
         if (Objects.isNull(aggregatePayment)) {
             return null;
         }
-        return new AggregatePaymentDTO(aggregatePayment.getFromDate(), aggregatePayment.getToDate());
+        return new AggregatePaymentDTO(aggregatePayment.getProductId(), aggregatePayment.getFromDate(), aggregatePayment.getToDate());
     }
 
     public AggregatePayment mapToEntity(final AggregatePaymentDTO dto, final CustomerDTO customer) {
 
         return AggregatePayment.builder().customerId(customer.customerId()).khatabookId(customer.khatabookId()).fromDate(
-                dto.from()).toDate(dto.to()).build();
+                dto.from()).toDate(dto.to()).productId(dto.productId()).build();
     }
 
 }

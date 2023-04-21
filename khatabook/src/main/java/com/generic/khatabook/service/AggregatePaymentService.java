@@ -8,4 +8,6 @@ public interface AggregatePaymentService {
     void paymentAggregate(KhatabookDTO khatabook, CustomerDTO customer, AggregatePaymentDTO payment);
 
     AggregatePaymentDTO getLastAggregation(KhatabookDTO khatabook, CustomerDTO customer);
+
+    void allPaymentAggregate(KhatabookDTO khatabook, CustomerDTO customerDTO, AggregatePaymentDTO payment);
 }

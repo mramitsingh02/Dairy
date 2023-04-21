@@ -1,5 +1,6 @@
 package com.generic.khatabook.controller;
 
+import com.generic.khatabook.common.exceptions.NoPaymentForAggregateException;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.AggregatePaymentDTO;
@@ -36,6 +37,29 @@ public class PaymentAggregationController {
     @Autowired
     private IdGeneratorService myIdGeneratorService;
 
+
+    @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/aggregate/all")
+    public ResponseEntity<?> aggregatedAllPayment(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody AggregatePaymentDTO payment) {
+
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        if (Objects.isNull(khatabook)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
+        }
+
+        final var customer = myCustomerService.getByCustomerId(customerId);
+
+        if (Objects.isNull(customer)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+        }
+
+        try {
+            myAggregatePaymentService.allPaymentAggregate(khatabook, customer.get(), payment);
+        } catch (NoPaymentForAggregateException e) {
+            return ResponseEntity.of(e.get()).build();
+        }
+
+        return ResponseEntity.ok().build();
+    }
     @PostMapping(path = "/khatabook/{khatabookId}/customer/{customerId}/aggregate")
     public ResponseEntity<?> aggregatedPayment(@PathVariable String khatabookId, @PathVariable String customerId, @RequestBody AggregatePaymentDTO payment) {
 
@@ -47,10 +71,14 @@ public class PaymentAggregationController {
         final var customer = myCustomerService.getByCustomerId(customerId);
 
         if (Objects.isNull(customer)) {
-            return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
-        myAggregatePaymentService.paymentAggregate(khatabook, customer.get(), payment);
+        try {
+            myAggregatePaymentService.paymentAggregate(khatabook, customer.get(), payment);
+        } catch (NoPaymentForAggregateException e) {
+            return ResponseEntity.of(e.get()).build();
+        }
 
         return ResponseEntity.ok().build();
     }
@@ -85,7 +113,7 @@ public class PaymentAggregationController {
 
         final var customer = myCustomerService.getByCustomerId(customerId);
         if (Objects.isNull(customer)) {
-             return ResponseEntity.of( new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         return ResponseEntity.ok(myAggregatePaymentService.getLastAggregation(khatabook, customer.get()));
     }

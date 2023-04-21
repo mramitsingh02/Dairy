@@ -27,14 +27,13 @@ public class AggregatePayment {
     private Long id;
     private String customerId;
     private String khatabookId;
-    //    @Embedded
-//    private TimePeriod timePeriod;
-    private LocalDate fromDate;
-    private LocalDate toDate;
+    private String productId;
+    private LocalDateTime fromDate;
+    private LocalDateTime toDate;
     @CreationTimestamp
     private LocalDateTime createdOn;
 
-    public AggregatePayment(final LocalDate from, final LocalDate to) {
+    public AggregatePayment(final LocalDateTime from, final LocalDateTime to) {
 
     }
 }

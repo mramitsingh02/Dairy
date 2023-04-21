@@ -1,25 +1,26 @@
 package com.generic.khatabook.service.impl;
 
+import com.generic.khatabook.entity.Amount;
 import com.generic.khatabook.entity.CustomerPayment;
+import com.generic.khatabook.entity.CustomerPaymentAggregated;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.exchanger.CustomerSpecificationClient;
 import com.generic.khatabook.exchanger.ProductClient;
-import com.generic.khatabook.model.AggregatePaymentDTO;
-import com.generic.khatabook.model.AmountDTO;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerProductSpecificationDTO;
-import com.generic.khatabook.model.CustomerSpecificationDTO;
-import com.generic.khatabook.model.PaymentDTO;
-import com.generic.khatabook.model.ProductDTO;
-import com.generic.khatabook.model.UnitOfMeasurement;
+import com.generic.khatabook.model.*;
+import com.generic.khatabook.service.mapper.AmountMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.BinaryOperator;
 
 import static java.util.Objects.nonNull;
 
@@ -29,8 +30,7 @@ public final class PaymentLogic {
     private final ProductClient productClient;
 
     @Autowired
-    public PaymentLogic(final CustomerSpecificationClient customerSpecificationClient,
-                        final ProductClient productClient) {
+    public PaymentLogic(final CustomerSpecificationClient customerSpecificationClient, final ProductClient productClient) {
         this.customerSpecificationClient = customerSpecificationClient;
         this.productClient = productClient;
     }
@@ -46,24 +46,17 @@ public final class PaymentLogic {
             final ProductDTO customerProduct = getCustomerProduct(paymentDTO.productId());
             final CustomerSpecificationDTO customerProductSpecification = getCustomerSpecification(customerDTO);
             if (nonNull(customerProduct) && nonNull(customerProductSpecification)) {
-                final CustomerProductSpecificationDTO customerProductSpecificationDTO = getCustomerProductSpecificationDTO(
-                        customerProduct,
-                        customerProductSpecification);
+                final CustomerProductSpecificationDTO customerProductSpecificationDTO = getCustomerProductSpecificationDTO(customerProduct, customerProductSpecification);
                 if (nonNull(customerProductSpecificationDTO)) {
-                    unitOfMeasurement =
-                            (UnitOfMeasurement.NONE == customerProductSpecificationDTO.unitOfMeasurement()) ?
-                                    customerProduct.unitOfMeasurement() : customerProductSpecificationDTO.unitOfMeasurement();
+                    unitOfMeasurement = (UnitOfMeasurement.NONE == customerProductSpecificationDTO.unitOfMeasurement()) ? customerProduct.unitOfMeasurement() : customerProductSpecificationDTO.unitOfMeasurement();
                     if (UnitOfMeasurement.KILOGRAM == unitOfMeasurement || UnitOfMeasurement.LITTER == unitOfMeasurement) {
                         if (Objects.nonNull(customerProductSpecificationDTO.unitOfValue().price())) {
-                            finalTotalAmount = customerProductSpecificationDTO.unitOfValue().price().multiply(BigDecimal.valueOf(
-                                    customerProductSpecificationDTO.quantity()));
+                            finalTotalAmount = customerProductSpecificationDTO.unitOfValue().price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                         } else {
-                            finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(
-                                    customerProductSpecificationDTO.quantity()));
+                            finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                         }
                     } else {
-                        finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(
-                                customerProductSpecificationDTO.quantity()));
+                        finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                     }
 
 
@@ -74,28 +67,58 @@ public final class PaymentLogic {
                 finalTotalAmount = paymentDTO.amount().value();
             }
 
-            return new PaymentDTO(paymentDTO.to(),
-                                  paymentDTO.from(),
-                                  paymentDTO.productId(),
-                                  AmountDTO.of(finalTotalAmount,
-                                               unitOfMeasurement.getUnitType())
-            );
+            return new PaymentDTO(paymentDTO.to(), paymentDTO.from(), paymentDTO.productId(), AmountDTO.of(finalTotalAmount, unitOfMeasurement.getUnitType()));
         }
 
         return paymentDTO;
     }
 
 
-    public CustomerPayment aggregatePayment(CustomerDTO customerDTO, AggregatePaymentDTO aggregatePaymentDTO){
+    public CustomerPaymentAggregatedDTO aggregatePayment(CustomerDTO customerDTO, AggregatePaymentDTO aggregatePaymentDTO, List<CustomerPayment> customerAllPaymentBetweenRange) {
 
-        return new CustomerPayment();
+        List<CustomerPayment> customerPayments = customerAllPaymentBetweenRange.stream().sorted(Comparator.comparing(CustomerPayment::getPaymentOnDate)).toList();
+        CustomerPayment customerFirstPayment = customerPayments.get(0);
+        CustomerPayment customerLastPayment = customerPayments.get(customerPayments.size() - 1);
+
+        PaymentStatistics paymentStatistics = getPaymentStatistics(customerAllPaymentBetweenRange);
+
+        CustomerPayment customerPayment = new CustomerPayment(null, customerDTO.khatabookId(), customerDTO.customerId(), PaymentType.AGGRIGATED.name(),  Amount.of(paymentStatistics.total().value(), paymentStatistics.total().unitOfMeasurement()) , aggregatePaymentDTO.productId(), LocalDateTime.now(), "Aggregated");
+
+        return new CustomerPaymentAggregatedDTO(new AggregatePaymentDTO(aggregatePaymentDTO.productId(), customerFirstPayment.getPaymentOnDate(), customerLastPayment.getPaymentOnDate()),
+                customerPayment
+        );
     }
 
-    private CustomerProductSpecificationDTO getCustomerProductSpecificationDTO(final ProductDTO customerProduct,
-                                                                               final CustomerSpecificationDTO customerProductSpecification) {
-        return customerProductSpecification.products().stream().filter(product -> isSameProduct(customerProduct,
-                                                                                                product)).findFirst().orElse(
-                CustomerProductSpecificationDTO.nonProduct());
+    public PaymentStatistics getPaymentStatistics(final Collection<CustomerPayment> customersPayment) {
+        BinaryOperator<AmountDTO> addAmount = AmountMapper::add;
+        final AmountDTO totalCredited = customersPayment.stream().filter(this::isCreditRecord).map(CustomerPayment::getAmount).map(AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
+
+        final AmountDTO totalDebited = customersPayment.stream().filter(this::isDebitRecord).map(CustomerPayment::getAmount).map(AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
+        final AmountDTO aggregatedAmount = customersPayment.stream().filter(this::isAggregatedRecord).map(CustomerPayment::getAmount).map(AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
+        final AmountDTO total = aggregatedAmount.pluse(totalCredited).minus(totalDebited);
+
+        if (customersPayment.isEmpty()) {
+            return null;
+        }
+
+        return new PaymentStatistics(total, totalCredited, totalDebited);
+    }
+
+
+    private boolean isCreditRecord(final CustomerPayment x) {
+        return x.getPaymentType().equals(PaymentType.CREDIT.name());
+    }
+
+    private boolean isDebitRecord(final CustomerPayment x) {
+        return x.getPaymentType().equals(PaymentType.DEBIT.name());
+    }
+
+    private boolean isAggregatedRecord(final CustomerPayment x) {
+        return x.getPaymentType().equals(PaymentType.AGGRIGATED.name());
+    }
+
+    private CustomerProductSpecificationDTO getCustomerProductSpecificationDTO(final ProductDTO customerProduct, final CustomerSpecificationDTO customerProductSpecification) {
+        return customerProductSpecification.products().stream().filter(product -> isSameProduct(customerProduct, product)).findFirst().orElse(CustomerProductSpecificationDTO.nonProduct());
     }
 
     private boolean isSameProduct(final ProductDTO customerProduct, final CustomerProductSpecificationDTO x) {
@@ -118,10 +141,7 @@ public final class PaymentLogic {
 
     private CustomerSpecificationDTO getCustomerSpecification(final CustomerDTO customerDTO) {
         try {
-            final ResponseEntity<CustomerSpecificationDTO> responseEntity = customerSpecificationClient.getById(
-                    customerDTO.khatabookId(),
-                    customerDTO.customerId(),
-                    customerDTO.specificationId());
+            final ResponseEntity<CustomerSpecificationDTO> responseEntity = customerSpecificationClient.getById(customerDTO.khatabookId(), customerDTO.customerId(), customerDTO.specificationId());
             if (Objects.isNull(responseEntity)) {
                 throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
             } else if (responseEntity.getBody() != null) {

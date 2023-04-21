@@ -74,8 +74,10 @@ public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPa
 
     @Override
     public CustomerPayment mapToEntity(final CustomerPaymentSummary customerPaymentSummary) {
-        return CustomerPayment.builder().khatabookId(customerPaymentSummary.khatabookId()).customerId(
-                customerPaymentSummary.customerId()).amount(Amount.of(customerPaymentSummary.amount().value(),
+        return CustomerPayment.builder().khatabookId(customerPaymentSummary.khatabookId())
+                .customerId(customerPaymentSummary.customerId())
+                .productId(customerPaymentSummary.productId())
+                .amount(Amount.of(customerPaymentSummary.amount().value(),
                                                                       customerPaymentSummary.amount().unitOfMeasurement())).paymentOnDate(
                 LocalDateTime.now(Clock.systemDefaultZone())).build();
     }

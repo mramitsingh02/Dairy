@@ -44,34 +44,12 @@ public class PaymentServiceImpl implements PaymentService {
     public KhatabookPaymentSummary getPaymentDetailByKhatabookId(final String khatabookId) {
 
         val customersPayment = myPaymentRepository.findByKhatabookId(khatabookId);
-        final PaymentStatistics paymentStatistics = getPaymentStatistics(customersPayment);
+        final PaymentStatistics paymentStatistics = paymentLogic. getPaymentStatistics(customersPayment);
         return new KhatabookPaymentSummary(paymentStatistics,
                                            CustomerPaymentMapper.mapToPojos(customersPayment));
     }
 
-    private PaymentStatistics getPaymentStatistics(final Collection<CustomerPayment> customersPayment) {
-        BinaryOperator<AmountDTO> addAmount = AmountMapper::add;
-        final AmountDTO totalCredited = customersPayment.stream().filter(this::isCreditRecord).map(CustomerPayment::getAmount).map(
-                AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
 
-        final AmountDTO totalDebited = customersPayment.stream().filter(this::isDebitRecord).map(CustomerPayment::getAmount).map(
-                AmountMapper::dto).reduce(AmountDTO.ZERO, addAmount);
-        final AmountDTO total = totalCredited.minus(totalDebited);
-
-        if (customersPayment.isEmpty()) {
-            return null;
-        }
-
-        return new PaymentStatistics(total, totalCredited, totalDebited);
-    }
-
-    private boolean isCreditRecord(final CustomerPayment x) {
-        return x.getPaymentType().equals(PaymentType.CREDIT.name());
-    }
-
-    private boolean isDebitRecord(final CustomerPayment x) {
-        return x.getPaymentType().equals(PaymentType.DEBIT.name());
-    }
 
     @Override
     public boolean savePayment(final KhatabookDTO khatabookDTO,
@@ -119,7 +97,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (isNull(allRecordForCustomer) || allRecordForCustomer.isEmpty()) {
             return null;
         }
-        return new KhatabookPaymentSummary(getPaymentStatistics(allRecordForCustomer),
+        return new KhatabookPaymentSummary(paymentLogic.getPaymentStatistics(allRecordForCustomer),
                                            CustomerPaymentMapper.mapToPojos(allRecordForCustomer,
                                                                             SummaryProperties.of(sorting, sortingBy))
                 );

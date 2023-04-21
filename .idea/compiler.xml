@@ -15,13 +15,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="common" target="17" />
       <module name="Dairy" target="1.5" />
-      <module name="errorframework" target="17" />
       <module name="errorframework (1)" target="17" />
-      <module name="khatabook" target="17" />
-      <module name="liquidbook" target="17" />
-      <module name="specification" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

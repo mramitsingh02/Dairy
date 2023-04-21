@@ -56,4 +56,8 @@ public record AmountDTO(BigDecimal value, String unitOfMeasurement, Currency cur
     public AmountDTO minus(final AmountDTO otherAmount) {
         return AmountDTO.of(this.value.subtract(otherAmount.value), this.currency);
     }
+
+    public AmountDTO pluse(AmountDTO otherAmount) {
+        return AmountDTO.of(this.value.add(otherAmount.value), this.currency);
+    }
 }
