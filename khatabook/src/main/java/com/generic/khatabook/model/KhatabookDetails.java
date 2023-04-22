@@ -18,26 +18,28 @@ public final class KhatabookDetails extends RepresentationModel<KhatabookDetails
     private final int numberOfCustomers;
     private final Set<CustomerDTO> customers;
     private final KhatabookPaymentSummary paymentSummary;
+    private final CustomerSpecificationDTO customerSpecification;
 
-    public KhatabookDetails(String bookId, String khatabookId, int numberOfCustomers, Set<CustomerDTO> customers, KhatabookPaymentSummary paymentSummary) {
+    public KhatabookDetails(String bookId, String khatabookId, int numberOfCustomers, Set<CustomerDTO> customers, KhatabookPaymentSummary paymentSummary, CustomerSpecificationDTO customerSpecification) {
         this.bookId = bookId;
         this.khatabookId = khatabookId;
         this.numberOfCustomers = numberOfCustomers;
         this.customers = customers;
         this.paymentSummary = paymentSummary;
+        this.customerSpecification = customerSpecification;
     }
 
 
     public KhatabookDetails(final KhatabookDTO khatabookDTO, final Set<CustomerDTO> customers) {
-        this(khatabookDTO.bookId(), khatabookDTO.khatabookId(), customers.size(), customers, KhatabookPaymentSummary.empty());
+        this(khatabookDTO.bookId(), khatabookDTO.khatabookId(), customers.size(), customers, KhatabookPaymentSummary.empty(), null);
     }
 
     public KhatabookDetails(final KhatabookDTO khatabookDTO, final Set<CustomerDTO> customers, final KhatabookPaymentSummary khatabookPaymentSummary) {
-        this(khatabookDTO.bookId(), khatabookDTO.khatabookId(), customers.size(), customers, khatabookPaymentSummary);
+        this(khatabookDTO.bookId(), khatabookDTO.khatabookId(), customers.size(), customers, khatabookPaymentSummary, null);
     }
 
-    public KhatabookDetails(final KhatabookDTO khatabook, final CustomerDTO customer, final KhatabookPaymentSummary customerDairy) {
-        this(khatabook.bookId(), khatabook.khatabookId(), 1, Set.of(customer), customerDairy);
+    public KhatabookDetails(final KhatabookDTO khatabook, final CustomerDTO customer, final KhatabookPaymentSummary customerDairy, CustomerSpecificationDTO customerSpecification) {
+        this(khatabook.bookId(), khatabook.khatabookId(), 1, Set.of(customer), customerDairy, customerSpecification);
     }
 
 

@@ -2,17 +2,11 @@ package com.generic.khatabook.service.impl;
 
 import com.generic.khatabook.entity.Amount;
 import com.generic.khatabook.entity.CustomerPayment;
-import com.generic.khatabook.entity.CustomerPaymentAggregated;
-import com.generic.khatabook.exceptions.AppEntity;
-import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.exchanger.CustomerSpecificationClient;
 import com.generic.khatabook.exchanger.ProductClient;
 import com.generic.khatabook.model.*;
 import com.generic.khatabook.service.mapper.AmountMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,16 +20,15 @@ import static java.util.Objects.nonNull;
 
 @Service
 public final class PaymentLogic {
-    private final CustomerSpecificationClient customerSpecificationClient;
+
     private final ProductClient productClient;
 
     @Autowired
-    public PaymentLogic(final CustomerSpecificationClient customerSpecificationClient, final ProductClient productClient) {
-        this.customerSpecificationClient = customerSpecificationClient;
+    public PaymentLogic(final ProductClient productClient) {
         this.productClient = productClient;
     }
 
-    public PaymentDTO calculateFinalPayment(final CustomerDTO customerDTO, final PaymentDTO paymentDTO) {
+    public PaymentDTO calculateFinalPayment(final CustomerDTO customerDTO, final PaymentDTO paymentDTO, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
         if (Objects.isNull(paymentDTO.productId())) {
             return paymentDTO;
         }
@@ -43,8 +36,6 @@ public final class PaymentLogic {
         final BigDecimal finalTotalAmount;
         UnitOfMeasurement unitOfMeasurement = UnitOfMeasurement.NONE;
         if (nonNull(customerDTO.specificationId())) {
-            final ProductDTO customerProduct = getCustomerProduct(paymentDTO.productId());
-            final CustomerSpecificationDTO customerProductSpecification = getCustomerSpecification(customerDTO);
             if (nonNull(customerProduct) && nonNull(customerProductSpecification)) {
                 final CustomerProductSpecificationDTO customerProductSpecificationDTO = getCustomerProductSpecificationDTO(customerProduct, customerProductSpecification);
                 if (nonNull(customerProductSpecificationDTO)) {
@@ -82,11 +73,9 @@ public final class PaymentLogic {
 
         PaymentStatistics paymentStatistics = getPaymentStatistics(customerAllPaymentBetweenRange);
 
-        CustomerPayment customerPayment = new CustomerPayment(null, customerDTO.khatabookId(), customerDTO.customerId(), PaymentType.AGGRIGATED.name(),  Amount.of(paymentStatistics.total().value(), paymentStatistics.total().unitOfMeasurement()) , aggregatePaymentDTO.productId(), LocalDateTime.now(), "Aggregated");
+        CustomerPayment customerPayment = new CustomerPayment(null, customerDTO.khatabookId(), customerDTO.customerId(), PaymentType.AGGRIGATED.name(), Amount.of(paymentStatistics.total().value(), paymentStatistics.total().unitOfMeasurement()), aggregatePaymentDTO.productId(), LocalDateTime.now(), "Aggregated");
 
-        return new CustomerPaymentAggregatedDTO(new AggregatePaymentDTO(aggregatePaymentDTO.productId(), customerFirstPayment.getPaymentOnDate(), customerLastPayment.getPaymentOnDate()),
-                customerPayment
-        );
+        return new CustomerPaymentAggregatedDTO(new AggregatePaymentDTO(aggregatePaymentDTO.productId(), customerFirstPayment.getPaymentOnDate(), customerLastPayment.getPaymentOnDate()), customerPayment);
     }
 
     public PaymentStatistics getPaymentStatistics(final Collection<CustomerPayment> customersPayment) {
@@ -125,32 +114,6 @@ public final class PaymentLogic {
         return x.productId().equals(customerProduct.id());
     }
 
-    private ProductDTO getCustomerProduct(final String productId) {
-        try {
-            final ResponseEntity<ProductDTO> responseEntity = productClient.getProductById(productId);
-            if (Objects.isNull(responseEntity)) {
-                throw new NotFoundException(AppEntity.PRODUCT, productId);
-            } else {
-                return responseEntity.getBody();
-            }
-        } catch (WebClientResponseException e) {
-            throw new NotFoundException(AppEntity.PRODUCT, productId);
-        }
 
-    }
 
-    private CustomerSpecificationDTO getCustomerSpecification(final CustomerDTO customerDTO) {
-        try {
-            final ResponseEntity<CustomerSpecificationDTO> responseEntity = customerSpecificationClient.getById(customerDTO.khatabookId(), customerDTO.customerId(), customerDTO.specificationId());
-            if (Objects.isNull(responseEntity)) {
-                throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
-            } else if (responseEntity.getBody() != null) {
-                return responseEntity.getBody();
-            }
-
-        } catch (WebClientResponseException e) {
-            throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
-        }
-        return null;
-    }
 }

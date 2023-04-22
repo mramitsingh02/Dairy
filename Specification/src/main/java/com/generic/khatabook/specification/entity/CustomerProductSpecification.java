@@ -15,6 +15,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -25,16 +26,16 @@ public class CustomerProductSpecification {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Long cid;
     private String productId;
-    private float quantity;
+    private Float quantity;
     @ManyToOne
-    @JoinColumn(name = "customerProductId")
-    CustomerSpecification customerSpecification;
+    @JoinColumn(name = "customer_specification_id", nullable = false)
+    private CustomerSpecification customerSpecification;
 
     private BigDecimal price;
-    private long start;
-    private long end;
+    private Long startUnit;
+    private Long endUnit;
     private String unitOfMeasurement;
 
     @CreationTimestamp

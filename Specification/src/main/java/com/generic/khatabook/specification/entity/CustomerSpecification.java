@@ -35,7 +35,7 @@ public class CustomerSpecification {
     private String customerId;
 //    private String specificationType;
     private String specificationFor;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "customerSpecification")
     private List<CustomerProductSpecification> products;
     @CreationTimestamp
     private LocalDateTime createdOn;

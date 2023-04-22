@@ -16,14 +16,14 @@ import java.util.Objects;
 public class CustomerProductSpecificationMapper implements Mapper<CustomerProductSpecification, CustomerProductSpecificationDTO, CustomerProductSpecificationUpdatable> {
     @Override
     public CustomerProductSpecification mapToEntity(final CustomerProductSpecificationDTO dto) {
-        return CustomerProductSpecification.builder().id(dto.id()).productId(dto.productId()).quantity(dto.quantity()).build();
+        return CustomerProductSpecification.builder().cid(dto.id()).productId(dto.productId()).quantity(dto.quantity()).build();
     }
 
     @Override
     public CustomerProductSpecificationDTO mapToDTO(final CustomerProductSpecification entity) {
-        return new CustomerProductSpecificationDTO(entity.getId(), entity.getProductId(), entity.getQuantity(),
-                                                   new UnitOfValue(entity.getPrice(), entity.getStart(),
-                                                                   entity.getEnd()),
+        return new CustomerProductSpecificationDTO(entity.getCid(), entity.getProductId(), entity.getQuantity(),
+                                                   new UnitOfValue(entity.getPrice(), entity.getStartUnit(),
+                                                                   entity.getEndUnit()),
                                                    getUnitOfMeasurement(entity.getUnitOfMeasurement())
                                                    );
     }

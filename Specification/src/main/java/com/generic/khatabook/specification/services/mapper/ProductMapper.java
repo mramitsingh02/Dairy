@@ -16,7 +16,9 @@ import java.util.Objects;
 public class ProductMapper implements Mapper<Product, ProductDTO, ProductUpdatable> {
     public Product mapToEntity(ProductDTO dto) {
         return Product.builder().id(dto.id()).name(dto.name()).price(dto.price()).unitOfMeasurement(
-                dto.unitOfMeasurement().getUnitType()).build();
+                        dto.unitOfMeasurement().getUnitType())
+                .quantity(dto.quantity() == 0 ? 1 : dto.quantity())
+                .build();
     }
 
     @Override
@@ -34,7 +36,7 @@ public class ProductMapper implements Mapper<Product, ProductDTO, ProductUpdatab
     @Override
     public ProductDTO mapToDTO(final Product product) {
         return new ProductDTO(product.getId(), product.getName(), product.getQuantity(), product.getPrice(),
-                              getUnitOfMeasurement(product), 0f);
+                getUnitOfMeasurement(product), 0f);
     }
 
     private UnitOfMeasurement getUnitOfMeasurement(final Product product) {

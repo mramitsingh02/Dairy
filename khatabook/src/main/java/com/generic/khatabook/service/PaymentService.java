@@ -1,10 +1,6 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.KhatabookDTO;
-import com.generic.khatabook.model.KhatabookPaymentSummary;
-import com.generic.khatabook.model.PaymentDTO;
-import com.generic.khatabook.model.PaymentType;
+import com.generic.khatabook.model.*;
 
 public interface PaymentService {
     public KhatabookPaymentSummary getPaymentDetailByKhatabookId(String khatabookId);
@@ -12,7 +8,8 @@ public interface PaymentService {
     boolean savePayment(KhatabookDTO khatabookDTO, CustomerDTO customerDTO, PaymentDTO paymentDTO, final PaymentType paymentType);
 
     KhatabookPaymentSummary getPaymentDetailForCustomer(CustomerDTO customerRequest);
+
     KhatabookPaymentSummary getPaymentDetailForCustomer(CustomerDTO customerRequest,
                                                         final String sorting,
-                                                        final String sortingBy);
+                                                        final String sortingBy, CustomerSpecificationDTO customerSpecification);
 }

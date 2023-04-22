@@ -4,10 +4,7 @@ import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.entity.Amount;
 import com.generic.khatabook.entity.CustomerPayment;
-import com.generic.khatabook.model.AmountDTO;
-import com.generic.khatabook.model.CustomerPaymentSummary;
-import com.generic.khatabook.model.PaymentType;
-import com.generic.khatabook.model.SummaryProperties;
+import com.generic.khatabook.model.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -23,7 +20,7 @@ import java.util.stream.Stream;
 public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPaymentSummary, Void> {
 
 
-    public static Collection<CustomerPaymentSummary> mapToPojos(final Collection<CustomerPayment> customersPayment) {
+    public static Collection<CustomerPaymentSummary> mapToPojos(final Collection<CustomerPayment> customersPayment, SummaryProperties of, CustomerSpecificationDTO customerSpecification) {
         final Stream<CustomerPaymentSummary> customerPaymentSummaryStream = customersPayment.stream().map(
                 CustomerPaymentMapper::mapToPojo);
         return customerPaymentSummaryStream.sorted(Comparator.comparing(CustomerPaymentSummary::paymentOnDate)).collect(

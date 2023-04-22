@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-@TestPropertySource(properties = {
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
+@TestPropertySource(properties = {"spring.jpa.hibernate.ddl-auto=create-drop"
+
+}, locations = "classpath:application-integrationtest.properties")
 class SpecificationManagementRepositoryTest {
 
     @Autowired

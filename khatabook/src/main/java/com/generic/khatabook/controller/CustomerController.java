@@ -5,16 +5,8 @@ import com.generic.khatabook.exceptions.InvalidArgumentException;
 import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.exchanger.SpecificationClient;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerUpdatable;
-import com.generic.khatabook.model.KhatabookDetails;
-import com.generic.khatabook.model.KhatabookPaymentSummary;
-import com.generic.khatabook.model.PaymentDTO;
-import com.generic.khatabook.model.SpecificationDTO;
-import com.generic.khatabook.service.CustomerService;
-import com.generic.khatabook.service.IdGeneratorService;
-import com.generic.khatabook.service.KhatabookService;
-import com.generic.khatabook.service.PaymentService;
+import com.generic.khatabook.model.*;
+import com.generic.khatabook.service.*;
 import com.generic.khatabook.validator.CustomerValidation;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +56,11 @@ public class CustomerController {
     @Autowired
     private CustomerValidation myCustomerValidation;
 
+    @Autowired
+    private CustomerSpecificationService customerSpecificationService;
+
     @GetMapping(path = "/khatabook/{khatabookId}/customers")
+    @PostMapping
     public ResponseEntity<KhatabookDetails> getKhatabookDetails(@PathVariable String khatabookId) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
@@ -144,10 +140,14 @@ public class CustomerController {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
-        final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails,
-                                                                                                   sorting, sortingBy);
+        CustomerSpecificationDTO customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails);
 
-        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy);
+        final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails,
+                                                                                                   sorting, sortingBy, customerSpecification);
+
+
+
+        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecification);
         final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(
                 null);
 
@@ -195,7 +195,7 @@ public class CustomerController {
 
         final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
 
-        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy);
+        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
 
         Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomerByMsisdn(khatabookId,
                                                                                                    msisdn,
@@ -260,7 +260,9 @@ public class CustomerController {
 
         final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
 
-        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy);
+
+
+        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
         final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(
                 null);
 
