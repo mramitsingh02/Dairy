@@ -9,6 +9,7 @@ public enum AppEntity {
     SPECIFICATION("Specification"),
     CUSTOMER("Customer"),
     MSISDN("Mobile"),
+    PAYMENT("Payment"),
     AMOUNT("Amount");
     private String myName;
 

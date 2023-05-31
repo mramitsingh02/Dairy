@@ -2,9 +2,12 @@ package com.generic.khatabook.service.impl;
 
 import com.generic.khatabook.entity.Amount;
 import com.generic.khatabook.entity.CustomerPayment;
+import com.generic.khatabook.exceptions.AppEntity;
+import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exchanger.ProductClient;
 import com.generic.khatabook.model.*;
 import com.generic.khatabook.service.mapper.AmountMapper;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BinaryOperator;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Service
@@ -29,19 +33,38 @@ public final class PaymentLogic {
     }
 
     public PaymentDTO calculateFinalPayment(final CustomerDTO customerDTO, final PaymentDTO paymentDTO, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
-        if (Objects.isNull(paymentDTO.productId())) {
+        if (isNull(customerDTO)) {
+            throw new InvalidArgumentValueException(AppEntity.CUSTOMER, "Not Found");
+        }
+
+        if (isNull(paymentDTO)) {
+            throw new InvalidArgumentValueException(AppEntity.PAYMENT, "Not Found");
+        }
+
+        if (isNull(paymentDTO.productId())) {
             return paymentDTO;
         }
 
+
+        if (Objects.nonNull(customerProductSpecification)) {
+            return calculateCustomerSpecificationFinalPayment(paymentDTO, customerProduct, customerProductSpecification);
+        }
+
+
+        return paymentDTO;
+    }
+
+    @Nullable
+    private PaymentDTO calculateCustomerSpecificationFinalPayment(PaymentDTO paymentDTO, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
         final BigDecimal finalTotalAmount;
         UnitOfMeasurement unitOfMeasurement = UnitOfMeasurement.NONE;
-        if (nonNull(customerDTO.specificationId())) {
-            if (nonNull(customerProduct) && nonNull(customerProductSpecification)) {
+        if (nonNull(customerProductSpecification)) {
+            if (nonNull(customerProduct)) {
                 final CustomerProductSpecificationDTO customerProductSpecificationDTO = getCustomerProductSpecificationDTO(customerProduct, customerProductSpecification);
                 if (nonNull(customerProductSpecificationDTO)) {
                     unitOfMeasurement = (UnitOfMeasurement.NONE == customerProductSpecificationDTO.unitOfMeasurement()) ? customerProduct.unitOfMeasurement() : customerProductSpecificationDTO.unitOfMeasurement();
                     if (UnitOfMeasurement.KILOGRAM == unitOfMeasurement || UnitOfMeasurement.LITTER == unitOfMeasurement) {
-                        if (Objects.nonNull(customerProductSpecificationDTO.unitOfValue().price())) {
+                        if (customerProductSpecificationDTO.hasCustomerSpecificPrice()) {
                             finalTotalAmount = customerProductSpecificationDTO.unitOfValue().price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                         } else {
                             finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
@@ -58,10 +81,9 @@ public final class PaymentLogic {
                 finalTotalAmount = paymentDTO.amount().value();
             }
 
-            return new PaymentDTO(paymentDTO.to(), paymentDTO.from(), paymentDTO.productId(), AmountDTO.of(finalTotalAmount, unitOfMeasurement.getUnitType()));
+            return new PaymentDTO(paymentDTO.to(), paymentDTO.from(), paymentDTO.productId(), AmountDTO.of(finalTotalAmount, paymentDTO.amount().unitOfMeasurement(), paymentDTO.amount().currency()));
         }
-
-        return paymentDTO;
+        return null;
     }
 
 
@@ -107,13 +129,12 @@ public final class PaymentLogic {
     }
 
     private CustomerProductSpecificationDTO getCustomerProductSpecificationDTO(final ProductDTO customerProduct, final CustomerSpecificationDTO customerProductSpecification) {
-        return customerProductSpecification.products().stream().filter(product -> isSameProduct(customerProduct, product)).findFirst().orElse(CustomerProductSpecificationDTO.nonProduct());
+        return customerProductSpecification.products().stream().filter(product -> isSameProduct(customerProduct, product)).findFirst().orElse(null);
     }
 
     private boolean isSameProduct(final ProductDTO customerProduct, final CustomerProductSpecificationDTO x) {
         return x.productId().equals(customerProduct.id());
     }
-
 
 
 }

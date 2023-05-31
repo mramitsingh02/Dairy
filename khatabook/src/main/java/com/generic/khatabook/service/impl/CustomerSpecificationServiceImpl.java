@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.Objects;
+import static java.util.Objects.isNull;
 
 @Service
 public class CustomerSpecificationServiceImpl implements CustomerSpecificationService {
@@ -25,9 +25,14 @@ public class CustomerSpecificationServiceImpl implements CustomerSpecificationSe
 
     @Override
     public CustomerSpecificationDTO getCustomerSpecification(CustomerDTO customerDTO) {
+
+        if (isNull(customerDTO.specificationId())) {
+            return null;
+        }
+
         try {
             final ResponseEntity<CustomerSpecificationDTO> responseEntity = customerSpecificationClient.getById(customerDTO.khatabookId(), customerDTO.customerId(), customerDTO.specificationId());
-            if (Objects.isNull(responseEntity)) {
+            if (isNull(responseEntity)) {
                 throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
             } else if (responseEntity.getBody() != null) {
                 return responseEntity.getBody();
@@ -35,6 +40,8 @@ public class CustomerSpecificationServiceImpl implements CustomerSpecificationSe
 
         } catch (WebClientResponseException e) {
             throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
+        } catch (Exception e) {
+            return null;
         }
         return null;
     }

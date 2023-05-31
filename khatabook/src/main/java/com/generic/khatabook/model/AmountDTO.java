@@ -12,7 +12,7 @@ import java.util.Map;
 public record AmountDTO(BigDecimal value, String unitOfMeasurement, Currency currency) {
 
     public static final Currency DEFAULT = Currency.getInstance(Locale.getDefault());
-    public static final AmountDTO ZERO = new AmountDTO();
+    public static final AmountDTO ZERO = new AmountDTO(BigDecimal.ZERO);
     public static final AmountDTO TEN = new AmountDTO(BigDecimal.TEN);
     private static final Map<BigDecimal, AmountDTO> map = new HashMap<>();
 

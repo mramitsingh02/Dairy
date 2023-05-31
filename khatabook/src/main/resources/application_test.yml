@@ -1,0 +1,36 @@
+server:
+  port: 8800
+  devtools:
+    add-properties: true
+
+spring:
+  application: Khatabook
+  messages:
+    basename:messages
+  h2:
+    console.enabled: true
+  datasource:
+    url: jdbc:h2:mem:khatabook_db
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    jpa.database-platform: org.hibernate.dialect.H2Dialect
+    jpa.hibernate.ddl-auto: update
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: *
+  health:
+    sho-details: always
+
+logging:
+  level:
+    org:
+      springframework: info
+
+
+console:
+  enabled:true
+## END
