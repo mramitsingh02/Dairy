@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -35,41 +37,36 @@ public class PaymentServiceImpl implements PaymentService {
     private ProductService productService;
 
     @Autowired
-    private PaymentLogic paymentLogic;
+    private PaymentNewLogic paymentLogic;
 
     @Override
     public KhatabookPaymentSummary getPaymentDetailByKhatabookId(final String khatabookId) {
 
         val customersPayment = myPaymentRepository.findByKhatabookId(khatabookId);
         final PaymentStatistics paymentStatistics = paymentLogic.getPaymentStatistics(customersPayment);
-        return new KhatabookPaymentSummary(paymentStatistics,
-                CustomerPaymentMapper.mapToPojos(customersPayment, null, null));
+        return new KhatabookPaymentSummary(paymentStatistics, CustomerPaymentMapper.mapToPojos(customersPayment, null, null));
     }
 
 
     @Override
-    public boolean savePayment(final KhatabookDTO khatabookDTO,
-                               final CustomerDTO customerDTO,
-                               final PaymentDTO paymentDTO,
-                               final PaymentType paymentType) {
+    public boolean savePayment(final KhatabookDTO khatabookDTO, final CustomerDTO customerDTO, final PaymentDTO paymentDTO, final PaymentType paymentType) {
 
         log.info("Save Payment for khatabook {}", khatabookDTO.khatabookId());
 
-
-        PaymentDTO finalPayment = paymentLogic.calculateFinalPayment(customerDTO, paymentDTO, productService.getCustomerProduct(customerDTO.productId()), customerSpecificationService.getCustomerSpecification(customerDTO));
-
-        if (isNull(finalPayment.productId()) && isNull(finalPayment.amount())) {
+        PaymentsDTO finalPayments = paymentLogic.calculateEachCustomerProduct(customerDTO, paymentDTO, productService.getCustomerProducts(customerDTO.products()), customerSpecificationService.getCustomerSpecification(customerDTO));
+        if (!finalPayments.hasAmounts()) {
             throw new InvalidArgumentValueException(AppEntity.AMOUNT, "pass the +ve value.");
         }
-        final Amount amount = Amount.of(finalPayment.amount().value(), finalPayment.amount().unitOfMeasurement());
-        final CustomerPayment customerPayment = CustomerPayment.builder().khatabookId(khatabookDTO.khatabookId()).customerId(
-                        customerDTO.customerId()).amount(amount).paymentType(paymentType.name())
-                .productId(paymentDTO.productId())
-                .paymentOnDate(LocalDateTime.now(
-                        Clock.systemDefaultZone())).build();
 
 
-        myPaymentRepository.save(customerPayment);
+        final List<CustomerPayment> customerPayments = new ArrayList<>();
+        for (PaymentDTO finalPayment : finalPayments) {
+            final Amount amount = Amount.of(finalPayment.products().get(0).amount().value(), finalPayment.products().get(0).amount().unitOfMeasurement());
+            customerPayments.add(CustomerPayment.builder().khatabookId(khatabookDTO.khatabookId()).customerId(customerDTO.customerId()).amount(amount).paymentType(paymentType.name()).productId(finalPayment.products().get(0).productId()).paymentOnDate(LocalDateTime.now(Clock.systemDefaultZone())).build());
+        }
+
+
+        myPaymentRepository.saveAll(customerPayments);
 
 
         return true;
@@ -84,20 +81,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public KhatabookPaymentSummary getPaymentDetailForCustomer(final CustomerDTO customerRequest,
-                                                               final String sorting,
-                                                               final String sortingBy,
-                                                               final CustomerSpecificationDTO customerSpecification) {
-        final Collection<CustomerPayment> allRecordForCustomer = myPaymentRepository.findByKhatabookIdAndCustomerId(
-                customerRequest.khatabookId(),
-                customerRequest.customerId());
+    public KhatabookPaymentSummary getPaymentDetailForCustomer(final CustomerDTO customerRequest, final String sorting, final String sortingBy, final CustomerSpecificationDTO customerSpecification) {
+        final Collection<CustomerPayment> allRecordForCustomer = myPaymentRepository.findByKhatabookIdAndCustomerId(customerRequest.khatabookId(), customerRequest.customerId());
         if (isNull(allRecordForCustomer) || allRecordForCustomer.isEmpty()) {
             return null;
         }
 
-        return new KhatabookPaymentSummary(paymentLogic.getPaymentStatistics(allRecordForCustomer),
-                CustomerPaymentMapper.mapToPojos(allRecordForCustomer,
-                        SummaryProperties.of(sorting, sortingBy), customerSpecification)
-        );
+        return new KhatabookPaymentSummary(paymentLogic.getPaymentStatistics(allRecordForCustomer), CustomerPaymentMapper.mapToPojos(allRecordForCustomer, SummaryProperties.of(sorting, sortingBy), customerSpecification));
     }
 }

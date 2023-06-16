@@ -2,9 +2,7 @@ package com.generic.khatabook.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerDTOTest {
     @Test
@@ -22,7 +20,7 @@ class CustomerDTOTest {
         assertEquals(customerDTO.msisdn(), "9911805***");
         assertEquals(customerDTO.firstName(), "Amit");
         assertEquals(customerDTO.lastName(), "Singh");
-        assertNull(customerDTO.productId());
+        assertNull(customerDTO.products());
         assertNull(customerDTO.specificationId());
     }
 
@@ -42,7 +40,7 @@ class CustomerDTOTest {
         assertEquals(customerDTO.msisdn(), customerDTOCopyOf.msisdn());
         assertEquals(customerDTO.firstName(), customerDTOCopyOf.firstName());
         assertEquals(customerDTO.lastName(), customerDTOCopyOf.lastName());
-        assertEquals(customerDTO.productId(), customerDTOCopyOf.productId());
+        assertEquals(customerDTO.products(), customerDTOCopyOf.products());
         assertEquals(customerDTO.specificationId(), customerDTOCopyOf.specificationId());
 
 

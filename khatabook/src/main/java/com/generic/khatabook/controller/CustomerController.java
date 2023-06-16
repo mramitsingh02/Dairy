@@ -15,15 +15,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.lang.reflect.Field;
@@ -69,9 +61,9 @@ public class CustomerController {
         }
 
         KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook,
-                                                                 myCustomerService.getAll(khatabookId),
-                                                                 myPaymentService.getPaymentDetailByKhatabookId(
-                                                                         khatabookId));
+                myCustomerService.getAll(khatabookId),
+                myPaymentService.getPaymentDetailByKhatabookId(
+                        khatabookId));
         return ResponseEntity.ok(khatabookDetails);
     }
 
@@ -89,22 +81,26 @@ public class CustomerController {
                         customerDTO.specificationId());
                 if (!responseEntity.hasBody()) {
                     return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION,
-                                                                   customerDTO.specificationId()).get()).build();
+                            customerDTO.specificationId()).get()).build();
                 }
             } catch (Exception e) {
                 return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION,
-                                                               customerDTO.specificationId()).get()).build();
+                        customerDTO.specificationId()).get()).build();
             }
         }
 
 
         val customer = customerDTO.copyOf(myIdGeneratorService.generateId());
-        myCustomerService.saveAndUpdate(customer);
+        try {
+            myCustomerService.saveAndUpdate(customer);
+        } catch (NotFoundException e) {
+            return ResponseEntity.of(e.get()).build();
+        }
         EntityModel<CustomerDTO> entityModel = EntityModel.of(customer);
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByCustomerId(null, null, khatabookId,
-                                                                                          customer.customerId())).withSelfRel());
+                customer.customerId())).withSelfRel());
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByMsisdn(khatabookId,
-                                                                                      customer.msisdn())).withSelfRel());
+                customer.msisdn())).withSelfRel());
 
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{specificationId}").buildAndExpand(
                 customerDTO.customerId()).toUri()).body(entityModel);
@@ -117,7 +113,7 @@ public class CustomerController {
             @PathVariable String khatabookId,
             @PathVariable String customerId
 
-                                                    ) {
+    ) {
 
 
         if (nonNull(sorting) && !isSortingPossibleValueValid(sorting)) {
@@ -126,9 +122,8 @@ public class CustomerController {
 
         if (nonNull(sortingBy) && !isSortingByPossibleValueValid(sortingBy)) {
             return ResponseEntity.of(new InvalidArgumentValueException("%s is invalid value for sortingBy, " +
-                                                                               "possible value will be (%s).".formatted( sorting, DATE_CUSTOMER_PRODUCT)).get()).build();
+                    "possible value will be (%s).".formatted(sorting, DATE_CUSTOMER_PRODUCT)).get()).build();
         }
-
 
 
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
@@ -143,8 +138,7 @@ public class CustomerController {
         CustomerSpecificationDTO customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails);
 
         final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails,
-                                                                                                   sorting, sortingBy, customerSpecification);
-
+                sorting, sortingBy, customerSpecification);
 
 
         KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecification);
@@ -152,17 +146,17 @@ public class CustomerController {
                 null);
 
         Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomer(khatabookId,
-                                                                                           customerLink,
-                                                                                           PaymentDTO.nullOf())).withRel(
+                customerLink,
+                PaymentDTO.nullOf())).withRel(
                 "PayTo");
 
         Link linkForReceivePayment = linkTo(methodOn(PaymentController.class).receiveFromCustomer(khatabookId,
-                                                                                                  customerLink,
-                                                                                                  PaymentDTO.nullOf())).withRel(
+                customerLink,
+                PaymentDTO.nullOf())).withRel(
                 "WithdrawFrom");
         Link linkForAggregate = linkTo(methodOn(PaymentAggregationController.class).aggregatedPayment(khatabookId,
-                                                                                                      customerLink,
-                                                                                                      null)).withRel(
+                customerLink,
+                null)).withRel(
                 "Aggregate");
 
         EntityModel<KhatabookDetails> entityModel = EntityModel.of(khatabookDetails);
@@ -198,12 +192,12 @@ public class CustomerController {
         KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
 
         Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomerByMsisdn(khatabookId,
-                                                                                                   msisdn,
-                                                                                                   PaymentDTO.nullOf())).withRel(
+                msisdn,
+                PaymentDTO.nullOf())).withRel(
                 "PayTo");
         Link linkForReceivePayment = linkTo(methodOn(PaymentController.class).receiveFromCustomerByMsisdn(khatabookId,
-                                                                                                          msisdn,
-                                                                                                          PaymentDTO.nullOf())).withRel(
+                msisdn,
+                PaymentDTO.nullOf())).withRel(
                 "WithdrawFrom");
         Link linkForAggregate = linkTo(methodOn(PaymentAggregationController.class).aggregatedPaymentByMsisdn(
                 khatabookId,
@@ -261,23 +255,22 @@ public class CustomerController {
         final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
 
 
-
         KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
         final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(
                 null);
 
         Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomer(khatabookId,
-                                                                                           customerLink,
-                                                                                           PaymentDTO.nullOf())).withRel(
+                customerLink,
+                PaymentDTO.nullOf())).withRel(
                 "PayTo");
 
         Link linkForReceivePayment = linkTo(methodOn(PaymentController.class).receiveFromCustomer(khatabookId,
-                                                                                                  customerLink,
-                                                                                                  PaymentDTO.nullOf())).withRel(
+                customerLink,
+                PaymentDTO.nullOf())).withRel(
                 "WithdrawFrom");
         Link linkForAggregate = linkTo(methodOn(PaymentAggregationController.class).aggregatedPayment(khatabookId,
-                                                                                                      customerLink,
-                                                                                                      null)).withRel(
+                customerLink,
+                null)).withRel(
                 "Aggregate");
 
         EntityModel<KhatabookDetails> entityModel = EntityModel.of(khatabookDetails);
@@ -310,9 +303,9 @@ public class CustomerController {
             }
         }
 
-        if (nonNull(customerDetails.getProductId())) {
+        if (nonNull(customerDetails.getProducts())) {
             final ProblemDetail customerProductValidation = myCustomerValidation.doCustomerProductValidation(
-                    customerDetails.getProductId());
+                    customerDetails.getProducts());
             if (nonNull(customerProductValidation)) {
                 return ResponseEntity.of(customerProductValidation).build();
             }

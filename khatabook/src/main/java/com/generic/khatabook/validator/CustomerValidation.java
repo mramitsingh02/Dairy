@@ -5,6 +5,7 @@ import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.exchanger.ProductClient;
 import com.generic.khatabook.exchanger.SpecificationClient;
 import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.model.Product;
 import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.KhatabookService;
 import lombok.val;
@@ -32,7 +33,8 @@ public class CustomerValidation {
     private KhatabookService myKhatabookService;
 
 
-    public ProblemDetail doCustomerProductValidation(final String productId) {
+    public ProblemDetail doCustomerProductValidation(final Product product) {
+        String productId = product.id();
         try {
             final ResponseEntity<?> responseEntity = myProductClient.getProductById(productId);
             if (Objects.isNull(responseEntity)) {
@@ -42,6 +44,10 @@ public class CustomerValidation {
             return new NotFoundException(AppEntity.PRODUCT, productId).get();
         }
         return null;
+    }
+
+    public ProblemDetail doCustomerProductValidation(final List<Product> products) {
+        return products.stream().map(this::doCustomerProductValidation).findFirst().orElse(null);
     }
 
     public List<ProblemDetail> createValidation(CustomerDTO customerDTO) {

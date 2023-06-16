@@ -1,18 +1,18 @@
 package com.generic.khatabook.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
@@ -33,6 +33,8 @@ public class Customer {
     private LocalDateTime updatedOn;
     private LocalDateTime deletedOn;
     private String specificationId;
-    private String productId;
+    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL/*, fetch = FetchType.EAGER*/)
+    @LazyCollection(value = LazyCollectionOption.FALSE)
+    private List<CustomerProduct> products = new ArrayList<>();
 
 }

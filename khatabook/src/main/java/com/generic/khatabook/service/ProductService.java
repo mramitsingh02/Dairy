@@ -1,16 +1,27 @@
 package com.generic.khatabook.service;
 
+import com.generic.khatabook.model.Product;
 import com.generic.khatabook.model.ProductDTO;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.service.annotation.GetExchange;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 public interface ProductService {
-    public List<ProductDTO> getAllProducts();
+    List<ProductDTO> getAllProducts();
 
-    public ProductDTO getCustomerProduct(String productId);
+    ProductDTO getCustomerProduct(Product productId);
+
+    default List<ProductDTO> getCustomerProducts(final List<Product> products) {
+        if (isNull(products) || products.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return products.stream().map(this::getCustomerProduct).collect(Collectors.toList());
+
+    }
 
 
 }

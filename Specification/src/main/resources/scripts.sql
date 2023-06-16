@@ -1,6 +1,6 @@
 
-truncate table customers;
+--truncate table customers;
 
-truncate table products;
+--truncate table products;
 
 

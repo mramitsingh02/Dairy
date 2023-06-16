@@ -3,9 +3,11 @@ package com.generic.khatabook.service.impl;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.exchanger.ProductClient;
+import com.generic.khatabook.model.Product;
 import com.generic.khatabook.model.ProductDTO;
 import com.generic.khatabook.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -29,21 +31,24 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
-    public ProductDTO getCustomerProduct(final String productId) {
-        if (isNull(productId)) {
+    @Cacheable
+    public ProductDTO getCustomerProduct(final Product product) {
+        if (isNull(product)) {
             return null;
         }
 
         try {
-            final ResponseEntity<ProductDTO> responseEntity = productClient.getProductById(productId);
+            final ResponseEntity<ProductDTO> responseEntity = productClient.getProductById(product.id());
             if (isNull(responseEntity)) {
-                throw new NotFoundException(AppEntity.PRODUCT, productId);
+                throw new NotFoundException(AppEntity.PRODUCT, product.id());
             } else {
                 return responseEntity.getBody();
             }
         } catch (WebClientResponseException e) {
-            throw new NotFoundException(AppEntity.PRODUCT, productId);
+            throw new NotFoundException(AppEntity.PRODUCT, product.id());
         }
 
     }
+
+
 }

@@ -23,73 +23,83 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Service
-public final class PaymentLogic {
+public final class PaymentNewLogic {
 
     private final ProductClient productClient;
 
     @Autowired
-    public PaymentLogic(final ProductClient productClient) {
+    public PaymentNewLogic(final ProductClient productClient) {
         this.productClient = productClient;
     }
 
-    public PaymentDTO calculateFinalPayment(final CustomerDTO customerDTO, final PaymentDTO paymentDTO, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
+    public PaymentsDTO calculateEachCustomerProduct(final CustomerDTO customerDTO, final PaymentDTO paymentDTO, List<ProductDTO> customerProducts, CustomerSpecificationDTO customerProductSpecification) {
+        PaymentsDTO paymentDTOS = new PaymentsDTO();
+        for (CustomerProductDTO customerPayment : paymentDTO.products()) {
+            if (isNull(customerPayment.productId())) {
+                paymentDTOS.add(new PaymentDTO(paymentDTO.to(), paymentDTO.from(), customerPayment));
+            } else {
+                for (ProductDTO customerProduct : customerProducts) {
+                    if (customerProduct.id().equals(customerPayment.productId())) {
+                        paymentDTOS.add(new PaymentDTO(paymentDTO.to(), paymentDTO.from(), calculateEachCustomerProduct(customerDTO, customerPayment, customerProduct, customerProductSpecification)));
+                    }
+                }
+            }
+        }
+        return paymentDTOS;
+    }
+
+    public CustomerProductDTO calculateEachCustomerProduct(final CustomerDTO customerDTO, final CustomerProductDTO customerPaymentProduct, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
         if (isNull(customerDTO)) {
             throw new InvalidArgumentValueException(AppEntity.CUSTOMER, "Not Found");
         }
 
-        if (isNull(paymentDTO)) {
+        if (isNull(customerPaymentProduct)) {
             throw new InvalidArgumentValueException(AppEntity.PAYMENT, "Not Found");
         }
-/*
 
-        if (isNull(paymentDTO.productId())) {
-            return paymentDTO;
+        if (isNull(customerPaymentProduct.productId())) {
+            return customerPaymentProduct;
         }
-*/
 
 
         if (Objects.nonNull(customerProductSpecification)) {
-            return calculateCustomerSpecificationFinalPayment(paymentDTO, customerProduct, customerProductSpecification);
+            return calculateCustomerPaymentBaseUponCustomerSpecification(customerPaymentProduct, customerProduct, customerProductSpecification);
         }
 
-
-        return paymentDTO;
+        return customerPaymentProduct;
     }
 
     @Nullable
-    private PaymentDTO calculateCustomerSpecificationFinalPayment(PaymentDTO paymentDTO, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
+    private CustomerProductDTO calculateCustomerPaymentBaseUponCustomerSpecification(CustomerProductDTO
+                                                                                             customerProductDTO, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
         final BigDecimal finalTotalAmount;
         UnitOfMeasurement unitOfMeasurement = UnitOfMeasurement.NONE;
-        if (nonNull(customerProductSpecification)) {
-            if (nonNull(customerProduct)) {
-                final CustomerProductSpecificationDTO customerProductSpecificationDTO = getCustomerProductSpecificationDTO(customerProduct, customerProductSpecification);
-                if (nonNull(customerProductSpecificationDTO)) {
-                    unitOfMeasurement = (UnitOfMeasurement.NONE == customerProductSpecificationDTO.unitOfMeasurement()) ? customerProduct.unitOfMeasurement() : customerProductSpecificationDTO.unitOfMeasurement();
-                    if (UnitOfMeasurement.KILOGRAM == unitOfMeasurement || UnitOfMeasurement.LITTER == unitOfMeasurement) {
-                        if (customerProductSpecificationDTO.hasCustomerSpecificPrice()) {
-                            finalTotalAmount = customerProductSpecificationDTO.unitOfValue().price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
-                        } else {
-                            finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
-                        }
+        if (nonNull(customerProduct)) {
+            final CustomerProductSpecificationDTO customerProductSpecificationDTO = getCustomerProductSpecificationDTO(customerProduct, customerProductSpecification);
+            if (nonNull(customerProductSpecificationDTO)) {
+                unitOfMeasurement = (UnitOfMeasurement.NONE == customerProductSpecificationDTO.unitOfMeasurement()) ? customerProduct.unitOfMeasurement() : customerProductSpecificationDTO.unitOfMeasurement();
+                if (UnitOfMeasurement.KILOGRAM == unitOfMeasurement || UnitOfMeasurement.LITTER == unitOfMeasurement) {
+                    if (customerProductSpecificationDTO.hasCustomerSpecificPrice()) {
+                        finalTotalAmount = customerProductSpecificationDTO.unitOfValue().price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                     } else {
                         finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                     }
-
-
                 } else {
-                    finalTotalAmount = customerProduct.price();
+                    finalTotalAmount = customerProduct.price().multiply(BigDecimal.valueOf(customerProductSpecificationDTO.quantity()));
                 }
             } else {
-//                finalTotalAmount = paymentDTO.amount().value();
+                finalTotalAmount = customerProduct.price();
             }
-
-//            return new PaymentDTO(paymentDTO.to(), paymentDTO.from(), paymentDTO.productId(), AmountDTO.of(finalTotalAmount, paymentDTO.amount().unitOfMeasurement(), paymentDTO.amount().currency()));
+        } else {
+            finalTotalAmount = customerProductDTO.amount().value();
         }
-        return null;
+
+        return new CustomerProductDTO(customerProductDTO.productId(), AmountDTO.of(finalTotalAmount, customerProductDTO.amount().unitOfMeasurement(), customerProductDTO.amount().currency()));
     }
 
 
-    public CustomerPaymentAggregatedDTO aggregatePayment(CustomerDTO customerDTO, AggregatePaymentDTO aggregatePaymentDTO, List<CustomerPayment> customerAllPaymentBetweenRange) {
+    public CustomerPaymentAggregatedDTO aggregatePayment(CustomerDTO customerDTO, AggregatePaymentDTO
+            aggregatePaymentDTO, List<CustomerPayment> customerAllPaymentBetweenRange) {
 
         List<CustomerPayment> customerPayments = customerAllPaymentBetweenRange.stream().sorted(Comparator.comparing(CustomerPayment::getPaymentOnDate)).toList();
         CustomerPayment customerFirstPayment = customerPayments.get(0);
@@ -130,7 +140,8 @@ public final class PaymentLogic {
         return x.getPaymentType().equals(PaymentType.AGGRIGATED.name());
     }
 
-    private CustomerProductSpecificationDTO getCustomerProductSpecificationDTO(final ProductDTO customerProduct, final CustomerSpecificationDTO customerProductSpecification) {
+    private CustomerProductSpecificationDTO getCustomerProductSpecificationDTO(final ProductDTO customerProduct,
+                                                                               final CustomerSpecificationDTO customerProductSpecification) {
         return customerProductSpecification.products().stream().filter(product -> isSameProduct(customerProduct, product)).findFirst().orElse(null);
     }
 
@@ -139,4 +150,9 @@ public final class PaymentLogic {
     }
 
 
+    public PaymentsDTO calculateEachCustomerProduct(CustomerDTO customerDTO, PaymentDTO paymentDTO) {
+        PaymentsDTO paymentDTOS = new PaymentsDTO();
+        paymentDTOS.add(paymentDTO);
+        return paymentDTOS;
+    }
 }
