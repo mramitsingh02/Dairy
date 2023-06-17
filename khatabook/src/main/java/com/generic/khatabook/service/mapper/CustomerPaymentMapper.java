@@ -59,13 +59,27 @@ public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPa
 
     private static CustomerPaymentSummary mapToPojo(final CustomerPayment customerPayment) {
         return new CustomerPaymentSummary(customerPayment.getKhatabookId(),
-                                          customerPayment.getCustomerId(),
-                                          PaymentType.valueOf(customerPayment.getPaymentType()),
+                customerPayment.getCustomerId(),
+                PaymentType.valueOf(customerPayment.getPaymentType()),
 
-                                          AmountDTO.of(customerPayment.getAmount().unitValue(),
-                                                       customerPayment.getAmount().unitOfMeasurement()),
-                                          customerPayment.getProductId(),
-                                          customerPayment.getPaymentOnDate());
+                AmountDTO.of(customerPayment.getAmount().unitValue(),
+                        customerPayment.getAmount().unitOfMeasurement()),
+                customerPayment.getProductId(),
+                customerPayment.getPaymentOnDate());
+    }
+
+    private static CustomerPaymentSummaryView mapToPojo(final CustomerDTO customer, final CustomerPayment customerPayment) {
+        String productName = customer.products().stream().filter(x -> x.id().equals(customerPayment.getProductId())).map(Product::name).findFirst().orElse("CASH");
+        return new CustomerPaymentSummaryView(customerPayment.getCustomerId(),
+                PaymentType.valueOf(customerPayment.getPaymentType()),
+                AmountDTO.of(customerPayment.getAmount().unitValue(),
+                        customerPayment.getAmount().unitOfMeasurement()),
+                new Product(customerPayment.getProductId(), productName),
+                customerPayment.getPaymentOnDate());
+    }
+
+    public static Collection<CustomerPaymentSummaryView> mapToPojos(CustomerDTO customerRequest, Collection<CustomerPayment> customersPayment, CustomerSpecificationDTO customerSpecification) {
+        return customersPayment.stream().map(x -> CustomerPaymentMapper.mapToPojo(customerRequest, x)).collect(Collectors.toList());
     }
 
 
@@ -75,8 +89,8 @@ public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPa
                 .customerId(customerPaymentSummary.customerId())
                 .productId(customerPaymentSummary.productId())
                 .amount(Amount.of(customerPaymentSummary.amount().value(),
-                                                                      customerPaymentSummary.amount().unitOfMeasurement())).paymentOnDate(
-                LocalDateTime.now(Clock.systemDefaultZone())).build();
+                        customerPaymentSummary.amount().unitOfMeasurement())).paymentOnDate(
+                        LocalDateTime.now(Clock.systemDefaultZone())).build();
     }
 
     @Override
@@ -87,13 +101,13 @@ public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPa
     @Override
     public CustomerPaymentSummary mapToDTO(final CustomerPayment customerPayment) {
         return new CustomerPaymentSummary(customerPayment.getKhatabookId(),
-                                          customerPayment.getCustomerId(),
-                                          PaymentType.valueOf(customerPayment.getPaymentType()),
+                customerPayment.getCustomerId(),
+                PaymentType.valueOf(customerPayment.getPaymentType()),
 
-                                          AmountDTO.of(customerPayment.getAmount().unitValue(),
-                                                       customerPayment.getAmount().unitOfMeasurement(),
-                                                       Currency.getInstance(customerPayment.getAmount().unitOfMeasurement())),
-                                          customerPayment.getProductId(),
-                                          customerPayment.getPaymentOnDate());
+                AmountDTO.of(customerPayment.getAmount().unitValue(),
+                        customerPayment.getAmount().unitOfMeasurement(),
+                        Currency.getInstance(customerPayment.getAmount().unitOfMeasurement())),
+                customerPayment.getProductId(),
+                customerPayment.getPaymentOnDate());
     }
 }

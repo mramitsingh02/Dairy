@@ -66,8 +66,6 @@ public class CustomerServiceImpl implements CustomerService {
             }
             customer.setProducts(customerProducts);
         }
-
-
         return myCustomerMapper.mapToContainer(customer);
     }
 

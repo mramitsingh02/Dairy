@@ -12,4 +12,7 @@ public interface PaymentService {
     KhatabookPaymentSummary getPaymentDetailForCustomer(CustomerDTO customerRequest,
                                                         final String sorting,
                                                         final String sortingBy, CustomerSpecificationDTO customerSpecification);
+
+    KhatabookPaymentSummaryView getCustomerPaymentDetailView(CustomerDTO customerRequest,
+                                                             CustomerSpecificationDTO customerSpecification);
 }

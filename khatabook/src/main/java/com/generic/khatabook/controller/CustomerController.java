@@ -137,11 +137,10 @@ public class CustomerController {
 
         CustomerSpecificationDTO customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails);
 
-        final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails,
-                sorting, sortingBy, customerSpecification);
+        final KhatabookPaymentSummaryView customerDairy = myPaymentService.getCustomerPaymentDetailView(customerDetails, customerSpecification);
 
 
-        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecification);
+        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecification);
         final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(
                 null);
 
@@ -159,7 +158,7 @@ public class CustomerController {
                 null)).withRel(
                 "Aggregate");
 
-        EntityModel<KhatabookDetails> entityModel = EntityModel.of(khatabookDetails);
+        EntityModel<KhatabookDetailsView> entityModel = EntityModel.of(khatabookDetails);
         entityModel.add(linkForGivePayment);
         entityModel.add(linkForReceivePayment);
         entityModel.add(linkForAggregate);
@@ -187,9 +186,9 @@ public class CustomerController {
             return ResponseEntity.badRequest().body(new NotFoundException(AppEntity.MSISDN, msisdn));
         }
 
-        final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
+        final KhatabookPaymentSummaryView customerDairy = myPaymentService.getCustomerPaymentDetailView(customerDetails, null);
 
-        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
+        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
 
         Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomerByMsisdn(khatabookId,
                 msisdn,
@@ -204,7 +203,7 @@ public class CustomerController {
                 msisdn,
                 null)).withRel("Aggregate");
 
-        EntityModel<KhatabookDetails> entityModel = EntityModel.of(khatabookDetails);
+        EntityModel<KhatabookDetailsView> entityModel = EntityModel.of(khatabookDetails);
         entityModel.add(linkForGivePayment);
         entityModel.add(linkForReceivePayment);
         entityModel.add(linkForAggregate);
@@ -239,9 +238,9 @@ public class CustomerController {
     }
 
     @PutMapping(path = "/khatabook/{khatabookId}/customer/{customerId}")
-    public ResponseEntity<EntityModel<KhatabookDetails>> updateCustomer(@PathVariable String khatabookId,
-                                                                        @PathVariable String customerId,
-                                                                        @RequestBody CustomerDTO customerDTO) {
+    public ResponseEntity<EntityModel<KhatabookDetailsView>> updateCustomer(@PathVariable String khatabookId,
+                                                                            @PathVariable String customerId,
+                                                                            @RequestBody CustomerDTO customerDTO) {
 
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
         if (Objects.isNull(customerDetails)) {
@@ -252,10 +251,10 @@ public class CustomerController {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
-        final KhatabookPaymentSummary customerDairy = myPaymentService.getPaymentDetailForCustomer(customerDetails);
+        final KhatabookPaymentSummaryView customerDairy = myPaymentService.getCustomerPaymentDetailView(customerDetails, null);
 
 
-        KhatabookDetails khatabookDetails = new KhatabookDetails(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
+        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
         final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(
                 null);
 
@@ -273,7 +272,7 @@ public class CustomerController {
                 null)).withRel(
                 "Aggregate");
 
-        EntityModel<KhatabookDetails> entityModel = EntityModel.of(khatabookDetails);
+        EntityModel<KhatabookDetailsView> entityModel = EntityModel.of(khatabookDetails);
         entityModel.add(linkForGivePayment);
         entityModel.add(linkForReceivePayment);
         entityModel.add(linkForAggregate);

@@ -82,11 +82,22 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public KhatabookPaymentSummary getPaymentDetailForCustomer(final CustomerDTO customerRequest, final String sorting, final String sortingBy, final CustomerSpecificationDTO customerSpecification) {
-        final Collection<CustomerPayment> allRecordForCustomer = myPaymentRepository.findByKhatabookIdAndCustomerId(customerRequest.khatabookId(), customerRequest.customerId());
-        if (isNull(allRecordForCustomer) || allRecordForCustomer.isEmpty()) {
+        final Collection<CustomerPayment> allCustomerPayment = myPaymentRepository.findByKhatabookIdAndCustomerId(customerRequest.khatabookId(), customerRequest.customerId());
+        if (isNull(allCustomerPayment) || allCustomerPayment.isEmpty()) {
             return null;
         }
 
-        return new KhatabookPaymentSummary(paymentLogic.getPaymentStatistics(allRecordForCustomer), CustomerPaymentMapper.mapToPojos(allRecordForCustomer, SummaryProperties.of(sorting, sortingBy), customerSpecification));
+        return new KhatabookPaymentSummary(paymentLogic.getPaymentStatistics(allCustomerPayment), CustomerPaymentMapper.mapToPojos(allCustomerPayment, SummaryProperties.non(), customerSpecification));
     }
+
+    @Override
+    public KhatabookPaymentSummaryView getCustomerPaymentDetailView(final CustomerDTO customerRequest, final CustomerSpecificationDTO customerSpecification) {
+        final Collection<CustomerPayment> allCustomerPayment = myPaymentRepository.findByKhatabookIdAndCustomerId(customerRequest.khatabookId(), customerRequest.customerId());
+        if (isNull(allCustomerPayment) || allCustomerPayment.isEmpty()) {
+            return null;
+        }
+
+        return new KhatabookPaymentSummaryView(paymentLogic.getPaymentStatistics(allCustomerPayment), CustomerPaymentMapper.mapToPojos(customerRequest, allCustomerPayment, customerSpecification));
+    }
+
 }
