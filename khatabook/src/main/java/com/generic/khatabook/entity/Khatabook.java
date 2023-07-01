@@ -1,10 +1,6 @@
 package com.generic.khatabook.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +20,7 @@ public class Khatabook {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Long internalId;
     private String bookId;
     private String khatabookId;
     private String msisdn;
@@ -36,5 +32,9 @@ public class Khatabook {
     @UpdateTimestamp
     private LocalDateTime updatedOn;
     private LocalDateTime deletedOn;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id", referencedColumnName = "groupId")
+    private KhatabookGroup khatabookGroup;
+
 
 }

@@ -92,7 +92,7 @@ class PaymentLogicTest {
         assertNotNull(finalPayment);
         assertNotEquals(paymentDTO, finalPayment);
         assertEquals(paymentDTO.productId(), finalPayment.productId());
-        assertEquals(customerProduct.id(), finalPayment.productId());
+        assertEquals(customerProduct.productId(), finalPayment.productId());
         BigDecimal expected = productSpecificationDTO.unitOfValue().price().multiply(BigDecimal.valueOf(productSpecificationDTO.quantity()));
         assertEquals(expected, finalPayment.amount().value(), "Expected amount not match.");
     }
@@ -118,7 +118,7 @@ class PaymentLogicTest {
         assertNotNull(finalPayment);
         assertEquals(paymentDTO, finalPayment);
         assertEquals(paymentDTO.productId(), finalPayment.productId());
-        assertEquals(customerProduct.id(), finalPayment.productId());
+        assertEquals(customerProduct.productId(), finalPayment.productId());
         BigDecimal expected = paymentDTO.amount().value();
         assertEquals(expected, finalPayment.amount().value(), "Expected amount not match.");
     }
@@ -144,7 +144,7 @@ class PaymentLogicTest {
         assertNotNull(finalPayment);
         assertNotEquals(paymentDTO, finalPayment);
         assertEquals(paymentDTO.productId(), finalPayment.productId());
-        assertEquals(customerProduct.id(), finalPayment.productId());
+        assertEquals(customerProduct.productId(), finalPayment.productId());
         BigDecimal expected = customerProduct.price().multiply(BigDecimal.valueOf(productSpecificationDTO.quantity()));
         assertEquals(expected, finalPayment.amount().value(), "Expected amount not match.");
     }

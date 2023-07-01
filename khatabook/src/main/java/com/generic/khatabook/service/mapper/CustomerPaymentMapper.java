@@ -69,7 +69,7 @@ public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPa
     }
 
     private static CustomerPaymentSummaryView mapToPojo(final CustomerDTO customer, final CustomerPayment customerPayment) {
-        String productName = customer.products().stream().filter(x -> x.id().equals(customerPayment.getProductId())).map(Product::name).findFirst().orElse("CASH");
+        String productName = customer.products().stream().filter(x -> x.productId().equals(customerPayment.getProductId())).map(Product::name).findFirst().orElse("CASH");
         return new CustomerPaymentSummaryView(customerPayment.getCustomerId(),
                 PaymentType.valueOf(customerPayment.getPaymentType()),
                 AmountDTO.of(customerPayment.getAmount().unitValue(),

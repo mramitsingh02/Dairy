@@ -1,11 +1,11 @@
-package com.generic.khatabook.specification.services.mapper;
+package com.generic.khatabook.service.mapper;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Mapper;
-import com.generic.khatabook.specification.entity.CustomerProductSpecification;
-import com.generic.khatabook.specification.entity.CustomerSpecification;
-import com.generic.khatabook.specification.model.CustomerSpecificationDTO;
-import com.generic.khatabook.specification.model.CustomerSpecificationUpdatable;
+import com.generic.khatabook.entity.CustomerProductSpecification;
+import com.generic.khatabook.entity.CustomerSpecification;
+import com.generic.khatabook.model.CustomerSpecificationDTO;
+import com.generic.khatabook.model.CustomerSpecificationUpdatable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -61,17 +61,17 @@ public class CustomerSpecificationMapper implements Mapper<CustomerSpecification
 
     @Override
     public CustomerSpecificationDTO mapToDTO(final CustomerSpecification customerSpecification) {
-        return new CustomerSpecificationDTO(customerSpecification.getId(),
-                                            customerSpecification.getName(),
-                                            customerSpecification.getDescription(),
-                                            customerSpecification.getVersion(),
-                                            customerSpecification.getCustomerId(),
-                                            customerSpecification.getKhatabookId(),
-                                            customerSpecification.getSpecificationFor(),
-                                            myCustomerProductSpecificationMapper.mapToDTOs(customerSpecification.getProducts()),
-                                            customerSpecification.getCreatedOn(),
-                                            customerSpecification.getUpdatedOn(),
-                                            customerSpecification.getDeletedOn());
+        return new CustomerSpecificationDTO(customerSpecification.getCustomerSpecificationId(),
+                customerSpecification.getSpecificationName(),
+                customerSpecification.getDescription(),
+                customerSpecification.getVersion(),
+                customerSpecification.getCustomerId(),
+                customerSpecification.getKhatabookId(),
+                customerSpecification.getSpecificationFor(),
+                myCustomerProductSpecificationMapper.mapToDTOs(customerSpecification.getCustomerProductSpecifications()),
+                customerSpecification.getCreatedOn(),
+                customerSpecification.getUpdatedOn(),
+                customerSpecification.getDeletedOn());
     }
 
 }

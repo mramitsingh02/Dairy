@@ -20,4 +20,8 @@ public class CustomerUpdatable {
         return new CustomerDTO(this.customerId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.products, this.specificationId);
     }
 
+    public CustomerUpdatable addProduct(String productId, String name) {
+        products.add(new Product(productId, name));
+        return this;
+    }
 }

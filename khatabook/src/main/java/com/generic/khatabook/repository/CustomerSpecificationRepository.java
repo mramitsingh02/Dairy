@@ -1,6 +1,6 @@
-package com.generic.khatabook.specification.repository;
+package com.generic.khatabook.repository;
 
-import com.generic.khatabook.specification.entity.CustomerSpecification;
+import com.generic.khatabook.entity.CustomerSpecification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -71,7 +71,7 @@ public record CustomerDTO(String customerId,
             fullName = "%s %s".formatted(firstName, lastName);
         }
         if (Objects.nonNull(customerId)) {
-            custDetail = "and customer id %s".formatted(customerId);
+            custDetail = "and customer productId %s".formatted(customerId);
         }
 
         final String khatabookDetail = "belong to %s".formatted(khatabookId);

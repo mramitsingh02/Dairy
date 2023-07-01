@@ -15,40 +15,31 @@ import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.ProductService;
 import com.generic.khatabook.service.mapper.CustomerMapper;
 import com.generic.khatabook.service.mapper.ProductMapper;
-import io.micrometer.observation.Observation;
-import io.micrometer.observation.ObservationRegistry;
-import jakarta.persistence.EntityManagerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    @Autowired
-    private EntityManagerFactory myEntityManagerFactory;
 
-    @Autowired
-    private CustomerRepository myCustomerRepository;
-    @Autowired
-    private CustomerProductRepository myCustomerProductRepository;
-
-
-    @Autowired
-    private ProductService myProductService;
-
-
-    @Autowired
-    private CustomerMapper myCustomerMapper;
+    private final CustomerRepository myCustomerRepository;
+    private final CustomerProductRepository myCustomerProductRepository;
+    private final ProductService myProductService;
+    private final CustomerMapper myCustomerMapper;
 
     //Observability is the ability to measure the internal state of a system only by its external outputs
     //https://www.baeldung.com/spring-boot-3-observability
-    @Autowired
-    private ObservationRegistry myRegistry;
+//    private final ObservationRegistry myRegistry;
+
+
+    public CustomerServiceImpl(CustomerRepository myCustomerRepository, CustomerProductRepository myCustomerProductRepository, ProductService myProductService, CustomerMapper myCustomerMapper) {
+        this.myCustomerRepository = myCustomerRepository;
+        this.myCustomerProductRepository = myCustomerProductRepository;
+        this.myProductService = myProductService;
+        this.myCustomerMapper = myCustomerMapper;
+    }
 
     @Override
     public boolean isValid(CustomerDTO customerDTO) {
@@ -58,24 +49,25 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Container<CustomerDTO, CustomerUpdatable> getByCustomerId(final String customerId) {
         Customer customer = myCustomerRepository.findById(customerId).orElse(null);
-        List<CustomerProduct> customerProducts = myCustomerProductRepository.findByCustomerId(customerId);
-        if (customerProducts != null) {
-            for (CustomerProduct customerProduct : customerProducts) {
-                ProductDTO product = myProductService.getCustomerProduct(Product.of(customerProduct.getProductId()));
-                customerProduct.setProductName(product.name());
-            }
-            customer.setProducts(customerProducts);
+        for (CustomerProduct customerProduct : customer.getProducts()) {
+            ProductDTO product = myProductService.getCustomerProduct(Product.of(customerProduct.getProductId()));
+            customerProduct.setProductName(product.name());
         }
         return myCustomerMapper.mapToContainer(customer);
     }
 
-    private CustomerDTO getObservation(final String matrixName, final Supplier<CustomerDTO> supplierTask) {
-        return Observation.createNotStarted(matrixName, myRegistry).observe(supplierTask);
-    }
+//    private CustomerDTO getObservation(final String matrixName, final Supplier<CustomerDTO> supplierTask) {
+//        return Observation.createNotStarted(matrixName, myRegistry).observe(supplierTask);
+//    }
 
     @Override
     public CustomerDTO getByMsisdn(String msisdn) {
-        return myCustomerMapper.mapToDTO(myCustomerRepository.findByMsisdn(msisdn));
+        Customer customer = myCustomerRepository.findByMsisdn(msisdn);
+        for (CustomerProduct customerProduct : customer.getProducts()) {
+            ProductDTO product = myProductService.getCustomerProduct(Product.of(customerProduct.getProductId()));
+            customerProduct.setProductName(product.name());
+        }
+        return myCustomerMapper.mapToDTO(customer);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.generic.khatabook.model;
 
-public record Product(String id, String name) {
+public record Product(String productId, String name) {
     public Product(String productId) {
         this(productId, null);
     }

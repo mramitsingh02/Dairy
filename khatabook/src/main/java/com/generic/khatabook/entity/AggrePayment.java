@@ -1,6 +1,5 @@
 package com.generic.khatabook.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -9,31 +8,32 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "aggregate_payment")
+@Table(name = "ag_pm")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AggregatePayment {
+public class AggrePayment {
     @Id
-    @Column(name = "id", nullable = false)
     @GeneratedValue
     private Long id;
+/*
     private String customerId;
     private String khatabookId;
     private String productId;
-    private LocalDateTime fromDate;
-    private LocalDateTime toDate;
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+    @Column(name ="end_date")
+    private LocalDateTime endDate;
     @CreationTimestamp
     private LocalDateTime createdOn;
+*/
 
-    public AggregatePayment(final LocalDateTime from, final LocalDateTime to) {
+    public AggrePayment(LocalDateTime from, LocalDateTime localDateTime) {
 
     }
 }

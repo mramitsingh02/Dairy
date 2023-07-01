@@ -1,4 +1,4 @@
-package com.generic.khatabook.specification.model;
+package com.generic.khatabook.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CustomerProductSpecificationUpdatable {
-    private Long id;
+    private String id;
     private String productId;
     private float quantity;
     private UnitOfValue unitOfValue;

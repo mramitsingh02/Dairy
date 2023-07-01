@@ -6,6 +6,6 @@ import com.generic.khatabook.model.ProductDTO;
 
 public class ProductMapper {
     public static CustomerProduct mapToProduct(ProductDTO dto, Customer entity) {
-        return CustomerProduct.builder().productId(dto.id()).customer(entity).build();
+        return CustomerProduct.builder().productId(dto.id()).productName(dto.name()).customer(entity).build();
     }
 }

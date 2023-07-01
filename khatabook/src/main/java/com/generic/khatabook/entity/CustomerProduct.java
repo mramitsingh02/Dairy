@@ -18,16 +18,18 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public class CustomerProduct {
     @Id
-    @GeneratedValue
+    @Column(name = "ID")
+    @SequenceGenerator(name = "cus_prod_seq", sequenceName = "CUS_PROD_SEQ", allocationSize = 10)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cus_prod_seq")
     private Long Id;
-    private String productId;
     @Transient
     private String productName;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_product_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "customer_id", referencedColumnName = "customerId")
     private Customer customer;
+    private String productId;
 
-    public String getHumanreadableName() {
+    public String getHumanReadableName() {
         return productName + " (" + productId + ")";
     }
 

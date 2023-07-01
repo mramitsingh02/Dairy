@@ -1,8 +1,8 @@
 package com.generic.khatabook.service.impl;
 
-import com.generic.khatabook.entity.AggregatePayment;
-import com.generic.khatabook.entity.CustomerPayment;
 import com.generic.khatabook.common.exceptions.NoPaymentForAggregateException;
+import com.generic.khatabook.entity.AggrePayment;
+import com.generic.khatabook.entity.CustomerPayment;
 import com.generic.khatabook.model.AggregatePaymentDTO;
 import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.CustomerPaymentAggregatedDTO;
@@ -89,8 +89,8 @@ public class AggregatePaymentServiceImpl implements AggregatePaymentService {
 
     @Override
     public AggregatePaymentDTO getLastAggregation(final KhatabookDTO khatabook, final CustomerDTO customer) {
-        final AggregatePayment entity = myAggregatePaymentRepository.findOne(Example.of(AggregatePayment.builder().khatabookId(khatabook.khatabookId())
-                .customerId(customer.customerId())
+        final AggrePayment entity = myAggregatePaymentRepository.findOne(Example.of(AggrePayment.builder()/*.khatabookId(khatabook.khatabookId())
+                .customerId(customer.customerId())*/
                 .build())).orElse(null);
         assert entity != null;
         return myAggregatePaymentMapper.mapToDTO(entity);

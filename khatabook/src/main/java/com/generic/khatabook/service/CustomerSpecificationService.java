@@ -1,12 +1,24 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.Containers;
 import com.generic.khatabook.model.CustomerSpecificationDTO;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.HttpExchange;
+import com.generic.khatabook.model.CustomerSpecificationUpdatable;
 
 public interface CustomerSpecificationService {
-    public CustomerSpecificationDTO getCustomerSpecification(CustomerDTO customerDTO);
+
+    Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> get(String id);
+
+    CustomerSpecificationDTO save(CustomerSpecificationDTO customerSpecificationService);
+
+    Containers<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getByCustomerId(final String customerId);
+
+    Containers<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getCustomerSpecification(String khatabookId, String customerId);
+
+    void delete(CustomerSpecificationDTO customerSpecificationDTO);
+
+    Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getCustomerSpecification(String specificationId);
+
+    CustomerSpecificationDTO update(CustomerSpecificationDTO build);
+
 }

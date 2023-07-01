@@ -1,16 +1,13 @@
-package com.generic.khatabook.specification.entity;
+package com.generic.khatabook.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -22,22 +19,26 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(name = "customer_product_specifications")
+@DynamicInsert
+@DynamicUpdate
 public class CustomerProductSpecification {
 
     @Id
-    @GeneratedValue
-    private Long cid;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String customerProductSpecId;
     private String productId;
     private Float quantity;
-    @ManyToOne
-    @JoinColumn(name = "customer_specification_id", nullable = false)
+    private BigDecimal price;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(
+            name = "customer_specification_id",
+            referencedColumnName = "customerSpecificationId")
     private CustomerSpecification customerSpecification;
 
-    private BigDecimal price;
     private Long startUnit;
     private Long endUnit;
     private String unitOfMeasurement;
-
     @CreationTimestamp
     private LocalDateTime createdOn;
     @UpdateTimestamp

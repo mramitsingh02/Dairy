@@ -10,6 +10,8 @@ import com.generic.khatabook.specification.model.ProductUpdatable;
 import com.generic.khatabook.specification.services.IdGeneratorService;
 import com.generic.khatabook.specification.services.ProductManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -63,8 +65,12 @@ public class ProductManagementController {
         if (Objects.isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, product.name()).get()).build();
         }
-        final ProductDTO newProduct = myProductManagementService.saveProduct(product.copyOf(myIdGeneratorService.generateId()));
-        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{productId}").buildAndExpand(product.id()).toUri()).body(newProduct);
+        try {
+            final ProductDTO newProduct = myProductManagementService.saveProduct(product.copyOf(myIdGeneratorService.generateId()));
+            return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{productId}").buildAndExpand(product.id()).toUri()).body(newProduct);
+        } catch (Exception e) {
+            return ResponseEntity.of(ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), e.getMessage())).build();
+        }
     }
 
     @PostMapping(path = "/products")

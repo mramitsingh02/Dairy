@@ -11,7 +11,7 @@ public record KhatabookDTO(String groupId, String bookId,
 
 
     public KhatabookDTO copyOf(String bookId) {
-        return new KhatabookDTO(null, bookId, this.khatabookId, this.msisdn, this.partnerName, this.partnerDescription);
+        return new KhatabookDTO(groupId, bookId, this.khatabookId, this.msisdn, this.partnerName, this.partnerDescription);
     }
 
     public KhatabookDTO copyOf(String groupId, String bookId) {

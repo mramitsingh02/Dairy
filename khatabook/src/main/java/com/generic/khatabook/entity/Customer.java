@@ -6,12 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,6 +19,7 @@ import java.util.List;
 @Builder
 public class Customer {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String customerId;
     private String khatabookId;
     private String msisdn;
@@ -33,8 +31,7 @@ public class Customer {
     private LocalDateTime updatedOn;
     private LocalDateTime deletedOn;
     private String specificationId;
-    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL/*, fetch = FetchType.EAGER*/)
-    @LazyCollection(value = LazyCollectionOption.FALSE)
-    private List<CustomerProduct> products = new ArrayList<>();
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<CustomerProduct> products;
 
 }

@@ -5,6 +5,7 @@ import com.generic.khatabook.entity.Khatabook;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.model.KhatabookDTO;
+import com.generic.khatabook.repository.KhatabookGroupRepository;
 import com.generic.khatabook.repository.KhatabookRepository;
 import com.generic.khatabook.service.KhatabookService;
 import com.generic.khatabook.service.mapper.KhatabookMapper;
@@ -25,6 +26,8 @@ public class KhatabookServiceImpl implements KhatabookService {
     private KhatabookRepository myKhatabookRepository;
     @Autowired
     private KhatabookMapper myKhatabookMapper;
+    @Autowired
+    private KhatabookGroupRepository khatabookGroupRepository;
 
     @Override
     public boolean isValid(final KhatabookDTO khatabookDTO) {
@@ -40,7 +43,9 @@ public class KhatabookServiceImpl implements KhatabookService {
     public void create(final KhatabookDTO khatabookDTO) {
 
         log.info("Khatabook {} created.", khatabookDTO.khatabookId());
-        myKhatabookRepository.save(myKhatabookMapper.mapToEntity(khatabookDTO, GenerationDate.creation()));
+        Khatabook entity = myKhatabookMapper.mapToEntity(khatabookDTO, GenerationDate.creation());
+        entity.setKhatabookGroup(khatabookGroupRepository.findById(khatabookDTO.groupId()).orElse(null));
+        myKhatabookRepository.save(entity);
         log.info("Khatabook {} successful created.", khatabookDTO.khatabookId());
     }
 

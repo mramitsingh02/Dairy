@@ -6,7 +6,11 @@ import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.exchanger.SpecificationClient;
 import com.generic.khatabook.model.*;
-import com.generic.khatabook.service.*;
+import com.generic.khatabook.service.CustomerService;
+import com.generic.khatabook.service.IdGeneratorService;
+import com.generic.khatabook.service.KhatabookService;
+import com.generic.khatabook.service.PaymentService;
+import com.generic.khatabook.service.proxy.CustomerSpecificationService;
 import com.generic.khatabook.validator.CustomerValidation;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -90,17 +97,17 @@ public class CustomerController {
         }
 
 
-        val customer = customerDTO.copyOf(myIdGeneratorService.generateId());
+        CustomerDTO savedCustomer;
         try {
-            myCustomerService.saveAndUpdate(customer);
+            savedCustomer = myCustomerService.saveAndUpdate(customerDTO);
         } catch (NotFoundException e) {
             return ResponseEntity.of(e.get()).build();
         }
-        EntityModel<CustomerDTO> entityModel = EntityModel.of(customer);
+        EntityModel<CustomerDTO> entityModel = EntityModel.of(savedCustomer);
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByCustomerId(null, null, khatabookId,
-                customer.customerId())).withSelfRel());
+                savedCustomer.customerId())).withSelfRel());
         entityModel.add(linkTo(methodOn(CustomerController.class).getCustomerByMsisdn(khatabookId,
-                customer.msisdn())).withSelfRel());
+                savedCustomer.msisdn())).withSelfRel());
 
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{specificationId}").buildAndExpand(
                 customerDTO.customerId()).toUri()).body(entityModel);
@@ -296,7 +303,14 @@ public class CustomerController {
             final Field field = ReflectionUtils.findField(CustomerUpdatable.class, member.getKey());
             if (nonNull(field)) {
                 field.setAccessible(true);
-                ReflectionUtils.setField(field, customerDetails, member.getValue());
+                final Object valueToSet = member.getValue();
+                if (List.class.getName().equals(field.getType().getName())) {
+                    updateSubEntityOfCustomerProduct(customerDetails, field, valueToSet);
+                } else if (BigDecimal.class.getName().equals(field.getType().getName())) {
+                    ReflectionUtils.setField(field, customerDetails, BigDecimal.valueOf((Double) valueToSet));
+                } else {
+                    ReflectionUtils.setField(field, customerDetails, valueToSet);
+                }
             } else {
                 throw new InvalidArgumentException(AppEntity.CUSTOMER, member.getKey());
             }
@@ -313,5 +327,59 @@ public class CustomerController {
         final CustomerDTO updateCustomer = myCustomerService.saveAndUpdate(customerDetails.build());
 
         return ResponseEntity.ok(updateCustomer);
+    }
+
+
+    private void updateSubEntityOfCustomerProduct(final CustomerUpdatable customerDetails,
+                                                  final Field field,
+                                                  final Object valueToSet) {
+
+        switch (field.getGenericType().getTypeName()) {
+            case "java.util.List<com.generic.khatabook.model.Product>" -> updateCustomerProductUpdatable(
+                    customerDetails,
+                    (List<LinkedHashMap<String, Object>>) valueToSet);
+            default ->
+                    throw new com.generic.khatabook.common.exceptions.InvalidArgumentException(com.generic.khatabook.common.exceptions.AppEntity.CUSTOMER, field.getName());
+        }
+    }
+
+    private CustomerUpdatable updateCustomerProductUpdatable(final CustomerUpdatable customerDetails,
+                                                             final List<LinkedHashMap<String, Object>> valueToSet) {
+        List<LinkedHashMap<String, Object>> mapValue = valueToSet;
+        for (final LinkedHashMap<String, Object> eachProduct : mapValue) {
+
+            final String productId = (String) eachProduct.get("productId");
+            final String productName = (String) eachProduct.get("name");
+
+            final CustomerUpdatable oldProductSpecification = customerDetails.addProduct(productId, productName);
+            for (final Map.Entry<String, Object> customerProductSpecification : eachProduct.entrySet()) {
+                final Field eachField = ReflectionUtils.findField(Product.class,
+                        customerProductSpecification.getKey());
+                if (Objects.isNull(eachField)) {
+                    throw new com.generic.khatabook.common.exceptions.InvalidArgumentException(com.generic.khatabook.common.exceptions.AppEntity.PRODUCT, eachField.getName());
+                }
+                ReflectionUtils.makeAccessible(eachField);
+                setValueInField(oldProductSpecification, customerProductSpecification.getValue(), eachField);
+                if (Objects.isNull(oldProductSpecification.getCustomerId())) {
+                    //  customerDetails.addProduct(oldProductSpecification);
+                }
+            }
+            return customerDetails;
+
+        }
+        return null;
+    }
+
+    private void setValueInField(final CustomerUpdatable oldProductSpecification,
+                                 final Object valueToSet,
+                                 final Field eachField) {
+        if (eachField.getGenericType().getTypeName().equals("float")) {
+            ReflectionUtils.setField(eachField,
+                    oldProductSpecification,
+                    BigDecimal.valueOf((Double) valueToSet).floatValue());
+        }
+        if (BigDecimal.class.getName().equals(eachField.getType().getName())) {
+            ReflectionUtils.setField(eachField, oldProductSpecification, BigDecimal.valueOf((Double) valueToSet));
+        }
     }
 }

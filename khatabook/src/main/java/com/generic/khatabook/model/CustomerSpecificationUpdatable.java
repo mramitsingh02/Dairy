@@ -1,4 +1,4 @@
-package com.generic.khatabook.specification.model;
+package com.generic.khatabook.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -7,6 +7,8 @@ import com.generic.khatabook.entity.Khatabook;
 import com.generic.khatabook.model.KhatabookDTO;
 import org.springframework.stereotype.Component;
 
+import static java.util.Objects.nonNull;
+
 @Component
 public class KhatabookMapper implements Mapper<Khatabook, KhatabookDTO, Void> {
 
@@ -25,7 +27,12 @@ public class KhatabookMapper implements Mapper<Khatabook, KhatabookDTO, Void> {
         if (myKhatabook == null) {
             return null;
         }
-        return new KhatabookDTO(null, myKhatabook.getBookId(), myKhatabook.getKhatabookId(), myKhatabook.getMsisdn(), myKhatabook.getPartnerName(), myKhatabook.getPartnerDescription());
+        String groupId = null;
+        if (nonNull(myKhatabook.getKhatabookGroup())) {
+            groupId = myKhatabook.getKhatabookGroup().getGroupId();
+        }
+
+        return new KhatabookDTO(groupId, myKhatabook.getBookId(), myKhatabook.getKhatabookId(), myKhatabook.getMsisdn(), myKhatabook.getPartnerName(), myKhatabook.getPartnerDescription());
     }
 
     public Khatabook mapToEntity(KhatabookDTO myKhatabookDTO, final GenerationDate generationDate) {

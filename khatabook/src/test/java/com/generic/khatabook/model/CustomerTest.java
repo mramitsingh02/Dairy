@@ -45,8 +45,8 @@ class CustomerDTOTest {
 
 
         assertEquals("Amit Singh with 9911805*** belong to khatabookId.", customerDTO.toString());
-        assertEquals("Amit Singh with 9911805*** and customer id newId belong to khatabookId.",
-                     customerDTOCopyOf.toString());
+        assertEquals("Amit Singh with 9911805*** and customer productId newId belong to khatabookId.",
+                customerDTOCopyOf.toString());
         assertEquals("Anonymous user with 9911805*** belong to khatabookId.",
                      customerForAnonymous.toString());
 

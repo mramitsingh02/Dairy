@@ -38,14 +38,14 @@ public class ProductServiceImpl implements ProductService {
         }
 
         try {
-            final ResponseEntity<ProductDTO> responseEntity = productClient.getProductById(product.id());
+            final ResponseEntity<ProductDTO> responseEntity = productClient.getProductById(product.productId());
             if (isNull(responseEntity)) {
-                throw new NotFoundException(AppEntity.PRODUCT, product.id());
+                throw new NotFoundException(AppEntity.PRODUCT, product.productId());
             } else {
                 return responseEntity.getBody();
             }
         } catch (WebClientResponseException e) {
-            throw new NotFoundException(AppEntity.PRODUCT, product.id());
+            throw new NotFoundException(AppEntity.PRODUCT, product.productId());
         }
 
     }

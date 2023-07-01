@@ -1,7 +1,7 @@
 package com.generic.khatabook.model;
 
 public enum UnitOfMeasurement {
-    KILOGRAM("KG"), LITTER("L"), READING("R"), NONE("");
+    KILOGRAM("KG"), LITTER("L"), READING("R"), ITEM("I"), NONE("");
     private String myUnitType;
 
     UnitOfMeasurement(final String unitType) {

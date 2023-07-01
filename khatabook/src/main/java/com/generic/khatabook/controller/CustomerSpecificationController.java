@@ -1,4 +1,4 @@
-package com.generic.khatabook.specification.controller;
+package com.generic.khatabook.controller;
 
 import com.generic.khatabook.common.exceptions.AppEntity;
 import com.generic.khatabook.common.exceptions.DuplicateFoundException;
@@ -6,50 +6,38 @@ import com.generic.khatabook.common.exceptions.InvalidArgumentException;
 import com.generic.khatabook.common.exceptions.NotFoundException;
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
-import com.generic.khatabook.specification.exchanger.CustomerClient;
-import com.generic.khatabook.specification.model.CustomerProductSpecificationUpdatable;
-import com.generic.khatabook.specification.model.CustomerSpecificationDTO;
-import com.generic.khatabook.specification.model.CustomerSpecificationUpdatable;
-import com.generic.khatabook.specification.services.CustomerSpecificationService;
-import com.generic.khatabook.specification.services.IdGeneratorService;
+import com.generic.khatabook.model.*;
+import com.generic.khatabook.service.CustomerService;
+import com.generic.khatabook.service.CustomerSpecificationService;
+import com.generic.khatabook.service.IdGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
+import static java.util.Objects.nonNull;
 
 @RestController
 public class CustomerSpecificationController {
 
     private final CustomerSpecificationService myCustomerSpecificationService;
-    private final CustomerClient myCustomerClient;
     private final IdGeneratorService myIdGeneratorService;
+    private final CustomerService myCustomerService;
 
     @Autowired
     public CustomerSpecificationController(final CustomerSpecificationService thatCustomerSpecificationService,
-                                           final CustomerClient customerClient,
-                                           final IdGeneratorService myIdGeneratorService) {
+                                           final IdGeneratorService myIdGeneratorService, CustomerService myCustomerService) {
         this.myCustomerSpecificationService = thatCustomerSpecificationService;
-        myCustomerClient = customerClient;
         this.myIdGeneratorService = myIdGeneratorService;
+        this.myCustomerService = myCustomerService;
     }
 
 
@@ -64,21 +52,22 @@ public class CustomerSpecificationController {
                                     @RequestBody CustomerSpecificationDTO customerSpecificationDTO) {
 
 
-        customerSpecificationDTO = customerSpecificationDTO.copyOf(myIdGeneratorService.generateId(), khatabookId,
-                                                                   customerId);
+        final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
+        if (Objects.isNull(customerDetails)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+        }
+        if (!Objects.equals(khatabookId, customerDetails.khatabookId())) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
+        }
 
-        ResponseEntity<?> verifyCustomer = checkForKhataBookAndCustomer(khatabookId, customerId);
-        if (verifyCustomer.getStatusCode() != HttpStatus.OK) return verifyCustomer;
+
+        customerSpecificationDTO = customerSpecificationDTO.copyOf(myIdGeneratorService.generateId(), khatabookId,
+                customerId);
 
         ResponseEntity<?> checkForDuplicateRequestCreation = checkForDuplicateRequestCreation(customerSpecificationDTO);
         if (checkForDuplicateRequestCreation.getStatusCode() != HttpStatus.OK) return checkForDuplicateRequestCreation;
 
         final CustomerSpecificationDTO saved = myCustomerSpecificationService.save(customerSpecificationDTO);
-
-
-        final Map<String, Object> value = new HashMap<>();
-        value.put("specificationId", saved.id());
-        myCustomerClient.updatePartialCustomer(khatabookId, customerId, value);
 
 
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/khatabook/{khatabookId" + "}/customer" + "/{customerId" + "}/specification" + "/{specificationId}").buildAndExpand(
@@ -97,27 +86,15 @@ public class CustomerSpecificationController {
                 customerSpecificationDTO.id());
         if (customerSpecificationExists.isPresent()) {
             return ResponseEntity.of(new DuplicateFoundException(AppEntity.CUSTOMER_SPECIFICATION,
-                                                                 customerSpecificationDTO.id()).get()).build();
+                    customerSpecificationDTO.id()).get()).build();
         }
         return ResponseEntity.ok().build();
     }
 
-    private ResponseEntity<?> checkForKhataBookAndCustomer(final String khatabookId, final String customerId) {
-
-        try {
-            return myCustomerClient.getCustomerByCustomerId(khatabookId, customerId);
-        } catch (Exception e) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK,
-                                                           AppEntity.CUSTOMER,
-                                                           khatabookId,
-                                                           customerId).get()).build();
-        }
-    }
-
     @GetMapping("/khatabook/{khatabookId}/customer/{customerId}/specification/{specificationId}")
     public ResponseEntity<CustomerSpecificationDTO> getById(@PathVariable String khatabookId,
-                                     @PathVariable String customerId,
-                                     @PathVariable String specificationId) {
+                                                            @PathVariable String customerId,
+                                                            @PathVariable String specificationId) {
 
         Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> specificationDTOS = myCustomerSpecificationService.getCustomerSpecification(
                 specificationId);
@@ -146,6 +123,49 @@ public class CustomerSpecificationController {
 
 
     @PatchMapping("/khatabook/{khatabookId}/customer/{customerId}/specification/{specificationId}")
+    public ResponseEntity<?> patchUpdate1(@PathVariable String khatabookId,
+                                          @PathVariable String customerId,
+                                          @PathVariable String specificationId,
+                                          @RequestBody CustomerSpecificationDTO dto) {
+
+
+        final CustomerSpecificationUpdatable entityModel = myCustomerSpecificationService.getCustomerSpecification(
+                specificationId).updatable();
+        if (Objects.isNull(entityModel)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER_SPECIFICATION,
+                    specificationId).get()).build();
+        }
+
+        if (nonNull(dto.customerId())) {
+            entityModel.setCustomerId(dto.customerId());
+        }
+        if (nonNull(dto.description())) {
+            entityModel.setCustomerId(dto.description());
+        }
+        if (nonNull(dto.name())) {
+            entityModel.setName(dto.name());
+        }
+        if (nonNull(dto.products())) {
+            List<CustomerProductSpecificationDTO> newProduct = new ArrayList<>();
+            for (CustomerProductSpecificationUpdatable entityModelProduct : entityModel.getProducts()) {
+                for (CustomerProductSpecificationDTO product : dto.products()) {
+                    if (entityModelProduct.getProductId().equals(product.productId())) {
+                        newProduct.add(product);
+
+                    } else {
+
+                    }
+                }
+            }
+        }
+
+        entityModel.setVersion(entityModel.getVersion() + 1);
+        entityModel.setUpdatedOn(LocalDateTime.now(Clock.systemDefaultZone()));
+        final CustomerSpecificationDTO updateProduct = myCustomerSpecificationService.update(entityModel.build());
+        return ResponseEntity.ok(updateProduct);
+    }
+
+
     public ResponseEntity<?> patchUpdate(@PathVariable String khatabookId,
                                          @PathVariable String customerId,
                                          @PathVariable String specificationId,
@@ -156,11 +176,11 @@ public class CustomerSpecificationController {
                 specificationId).updatable();
         if (Objects.isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER_SPECIFICATION,
-                                                           specificationId).get()).build();
+                    specificationId).get()).build();
         }
         for (final Map.Entry<String, Object> member : requestMap.entrySet()) {
             final Field field = ReflectionUtils.findField(CustomerSpecificationUpdatable.class, member.getKey());
-            if (Objects.nonNull(field)) {
+            if (nonNull(field)) {
                 ReflectionUtils.makeAccessible(field);
                 final Object valueToSet = member.getValue();
 
@@ -186,9 +206,10 @@ public class CustomerSpecificationController {
                                                                final Object valueToSet) {
 
         switch (field.getGenericType().getTypeName()) {
-            case "java.util.List<com.generic.khatabook.specification.model.CustomerProductSpecificationUpdatable>" -> updateCustomerProductSpecificationUpdatable(
-                    entityModel,
-                    (List<LinkedHashMap<String, Object>>) valueToSet);
+            case "java.util.List<com.generic.khatabook.specification.model.CustomerProductSpecificationUpdatable>" ->
+                    updateCustomerProductSpecificationUpdatable(
+                            entityModel,
+                            (List<LinkedHashMap<String, Object>>) valueToSet);
             default -> throw new InvalidArgumentException(AppEntity.CUSTOMER_SPECIFICATION, field.getName());
         }
     }
@@ -203,7 +224,7 @@ public class CustomerSpecificationController {
             final CustomerProductSpecificationUpdatable oldProductSpecification = entityModel.getProducts(productId);
             for (final Map.Entry<String, Object> customerProductSpecification : eachProduct.entrySet()) {
                 final Field eachField = ReflectionUtils.findField(CustomerProductSpecificationUpdatable.class,
-                                                                  customerProductSpecification.getKey());
+                        customerProductSpecification.getKey());
                 if (Objects.isNull(eachField)) {
                     throw new InvalidArgumentException(AppEntity.CUSTOMER_SPECIFICATION, eachField.getName());
                 }
@@ -224,8 +245,8 @@ public class CustomerSpecificationController {
                                  final Field eachField) {
         if (eachField.getGenericType().getTypeName().equals("float")) {
             ReflectionUtils.setField(eachField,
-                                     oldProductSpecification,
-                                     BigDecimal.valueOf((Double) valueToSet).floatValue());
+                    oldProductSpecification,
+                    BigDecimal.valueOf((Double) valueToSet).floatValue());
         }
         if (BigDecimal.class.getName().equals(eachField.getType().getName())) {
             ReflectionUtils.setField(eachField, oldProductSpecification, BigDecimal.valueOf((Double) valueToSet));

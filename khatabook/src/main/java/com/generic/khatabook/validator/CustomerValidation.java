@@ -34,7 +34,7 @@ public class CustomerValidation {
 
 
     public ProblemDetail doCustomerProductValidation(final Product product) {
-        String productId = product.id();
+        String productId = product.productId();
         try {
             final ResponseEntity<?> responseEntity = myProductClient.getProductById(productId);
             if (Objects.isNull(responseEntity)) {
@@ -47,7 +47,13 @@ public class CustomerValidation {
     }
 
     public ProblemDetail doCustomerProductValidation(final List<Product> products) {
-        return products.stream().map(this::doCustomerProductValidation).findFirst().orElse(null);
+        for (Product product : products) {
+            ProblemDetail problemDetail = doCustomerProductValidation(product);
+            if (problemDetail != null) {
+                return problemDetail;
+            }
+        }
+        return null;
     }
 
     public List<ProblemDetail> createValidation(CustomerDTO customerDTO) {

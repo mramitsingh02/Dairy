@@ -1,8 +1,6 @@
 package com.generic.khatabook.model;
 
-import java.util.Objects;
-
-public record CustomerProductSpecificationDTO(Long id, String productId, float quantity, UnitOfValue unitOfValue,
+public record CustomerProductSpecificationDTO(String id, String productId, float quantity, UnitOfValue unitOfValue,
                                               UnitOfMeasurement unitOfMeasurement) {
 
 
@@ -10,7 +8,10 @@ public record CustomerProductSpecificationDTO(Long id, String productId, float q
         return new CustomerProductSpecificationDTO(null, null, 1, UnitOfValue.non(), UnitOfMeasurement.NONE);
     }
 
-    public boolean hasCustomerSpecificPrice() {
-        return Objects.nonNull(unitOfValue()) && Objects.nonNull(unitOfValue().price());
+    public CustomerProductSpecificationUpdatable updatable() {
+        return new CustomerProductSpecificationUpdatable(this.id, this.productId, this.quantity, this.unitOfValue,
+                this.unitOfMeasurement);
     }
+
 }
+

@@ -1,52 +1,63 @@
 package com.generic.khatabook.service.impl;
 
-import com.generic.khatabook.exceptions.AppEntity;
-import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.exchanger.CustomerSpecificationClient;
-import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.Containers;
 import com.generic.khatabook.model.CustomerSpecificationDTO;
+import com.generic.khatabook.model.CustomerSpecificationUpdatable;
+import com.generic.khatabook.repository.CustomerSpecificationRepository;
 import com.generic.khatabook.service.CustomerSpecificationService;
+import com.generic.khatabook.service.mapper.CustomerSpecificationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import static java.util.Objects.isNull;
 
 @Service
 public class CustomerSpecificationServiceImpl implements CustomerSpecificationService {
-    private final CustomerSpecificationClient customerSpecificationClient;
+
+    private CustomerSpecificationRepository myCustomerSpecificationRepository;
+    private CustomerSpecificationMapper myMapper;
 
     @Autowired
-    public CustomerSpecificationServiceImpl(CustomerSpecificationClient customerSpecificationClient) {
-        this.customerSpecificationClient = customerSpecificationClient;
+    public CustomerSpecificationServiceImpl(final CustomerSpecificationRepository thatCustomerSpecificationRepository,
+                                            final CustomerSpecificationMapper customerSpecificationMapper) {
+        this.myCustomerSpecificationRepository = thatCustomerSpecificationRepository;
+        myMapper = customerSpecificationMapper;
     }
-
 
     @Override
-    public CustomerSpecificationDTO getCustomerSpecification(CustomerDTO customerDTO) {
-
-        if (isNull(customerDTO.specificationId())) {
-            return null;
-        }
-
-        try {
-            final ResponseEntity<CustomerSpecificationDTO> responseEntity = customerSpecificationClient.getById(customerDTO.khatabookId(), customerDTO.customerId(), customerDTO.specificationId());
-            if (isNull(responseEntity)) {
-                throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
-            } else if (responseEntity.getBody() != null) {
-                return responseEntity.getBody();
-            }
-
-        } catch (WebClientResponseException e) {
-            throw new NotFoundException(AppEntity.SPECIFICATION, customerDTO.specificationId());
-        } catch (Exception e) {
-            return null;
-        }
-        return null;
+    public Containers<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getByCustomerId(final String customerId) {
+        return myMapper.mapToContainers(myCustomerSpecificationRepository.findByCustomerId(customerId));
     }
+
+    @Override
+    public Containers<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getCustomerSpecification(final String khatabookId,
+                                                                                                         final String customerId) {
+        return myMapper.mapToContainers(myCustomerSpecificationRepository.findByKhatabookIdAndCustomerId(khatabookId,
+                customerId));
+    }
+
+    @Override
+    public Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> getCustomerSpecification(final String specificationId) {
+        return myMapper.mapToContainer(myCustomerSpecificationRepository.findById(specificationId).orElse(null));
+    }
+
+    @Override
+    public CustomerSpecificationDTO update(final CustomerSpecificationDTO dto) {
+        return myMapper.mapToDTO(myCustomerSpecificationRepository.save(myMapper.mapToEntity(dto)));
+    }
+
+    @Override
+    public void delete(final CustomerSpecificationDTO customerSpecificationDTO) {
+        myCustomerSpecificationRepository.delete(myMapper.mapToEntity(customerSpecificationDTO));
+    }
+
+    @Override
+    public Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> get(final String id) {
+        return myMapper.mapToContainer(myCustomerSpecificationRepository.findById(id).orElse(null));
+    }
+
+    @Override
+    public CustomerSpecificationDTO save(final CustomerSpecificationDTO dto) {
+        return myMapper.mapToDTO(myCustomerSpecificationRepository.save(myMapper.mapToEntity(dto)));
+    }
+
 }
-
-
-
-

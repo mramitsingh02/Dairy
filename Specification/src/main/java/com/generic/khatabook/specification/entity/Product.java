@@ -1,8 +1,8 @@
 package com.generic.khatabook.specification.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +13,10 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products",
+        uniqueConstraints = {@UniqueConstraint(name = "product_name", columnNames = "name")}
+
+)
 @AllArgsConstructor
 @Builder
 @Data
@@ -22,10 +25,16 @@ import java.math.BigDecimal;
 @DynamicUpdate
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @NotEmpty
     private String name;
+    @PositiveOrZero(message = "quantity should be zero or positive number")
     private int quantity;
+    @PositiveOrZero(message = "price should be zero or positive number")
     private BigDecimal price;
+    @NotEmpty
     private String unitOfMeasurement;
 
 }
