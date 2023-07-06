@@ -6,11 +6,7 @@ import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exceptions.NotFoundException;
 import com.generic.khatabook.exchanger.SpecificationClient;
 import com.generic.khatabook.model.*;
-import com.generic.khatabook.service.CustomerService;
-import com.generic.khatabook.service.IdGeneratorService;
-import com.generic.khatabook.service.KhatabookService;
-import com.generic.khatabook.service.PaymentService;
-import com.generic.khatabook.service.proxy.CustomerSpecificationService;
+import com.generic.khatabook.service.*;
 import com.generic.khatabook.validator.CustomerValidation;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +23,8 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -63,7 +59,7 @@ public class CustomerController {
     public ResponseEntity<KhatabookDetails> getKhatabookDetails(@PathVariable String khatabookId) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
-        if (Objects.isNull(khatabook)) {
+        if (isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
@@ -78,28 +74,13 @@ public class CustomerController {
     public ResponseEntity<?> createCustomer(@PathVariable String khatabookId, @RequestBody CustomerDTO customerDTO) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
-        if (Objects.isNull(khatabook)) {
+        if (isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
-        if (customerDTO.specificationId() != null) {
-            try {
-                final ResponseEntity<SpecificationDTO> responseEntity = mySpecificationClient.getSpecificationId(
-                        customerDTO.specificationId());
-                if (!responseEntity.hasBody()) {
-                    return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION,
-                            customerDTO.specificationId()).get()).build();
-                }
-            } catch (Exception e) {
-                return ResponseEntity.of(new NotFoundException(AppEntity.SPECIFICATION,
-                        customerDTO.specificationId()).get()).build();
-            }
-        }
-
-
         CustomerDTO savedCustomer;
         try {
-            savedCustomer = myCustomerService.saveAndUpdate(customerDTO);
+            savedCustomer = myCustomerService.save(customerDTO);
         } catch (NotFoundException e) {
             return ResponseEntity.of(e.get()).build();
         }
@@ -134,15 +115,18 @@ public class CustomerController {
 
 
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
-        if (Objects.isNull(khatabook)) {
+        if (isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
+        CustomerSpecificationDTO customerSpecification = null;
+        if (nonNull(customerDetails.specification())) {
 
-        CustomerSpecificationDTO customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails);
+            customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails.specification().id()).get();
+        }
 
         final KhatabookPaymentSummaryView customerDairy = myPaymentService.getCustomerPaymentDetailView(customerDetails, customerSpecification);
 
@@ -184,18 +168,23 @@ public class CustomerController {
     public ResponseEntity<?> getCustomerByMsisdn(@PathVariable String khatabookId, @PathVariable String msisdn) {
 
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
-        if (Objects.isNull(khatabook)) {
+        if (isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final CustomerDTO customerDetails = myCustomerService.getCustomerByMsisdn(khatabookId, msisdn);
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.badRequest().body(new NotFoundException(AppEntity.MSISDN, msisdn));
         }
 
         final KhatabookPaymentSummaryView customerDairy = myPaymentService.getCustomerPaymentDetailView(customerDetails, null);
+        CustomerSpecificationDTO customerSpecification = null;
+        if (nonNull(customerDetails.specification())) {
 
-        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
+            customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails.specification().id()).get();
+        }
+
+        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecification);
 
         Link linkForGivePayment = linkTo(methodOn(PaymentController.class).gavenToCustomerByMsisdn(khatabookId,
                 msisdn,
@@ -221,7 +210,7 @@ public class CustomerController {
     public ResponseEntity<?> deleteByMsisdn(@PathVariable String msisdn) {
 
         final CustomerDTO customerDetails = myCustomerService.getByMsisdn(msisdn);
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.badRequest().body(new NotFoundException(AppEntity.MSISDN, msisdn));
         }
 
@@ -234,7 +223,7 @@ public class CustomerController {
     @DeleteMapping(path = "/khatabook/{khatabookId}/customer/{customerId}")
     public ResponseEntity<CustomerDTO> deleteByCustomerId(@PathVariable String customerId) {
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
 
@@ -250,18 +239,24 @@ public class CustomerController {
                                                                             @RequestBody CustomerDTO customerDTO) {
 
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
-        if (Objects.isNull(khatabook)) {
+        if (isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
         final KhatabookPaymentSummaryView customerDairy = myPaymentService.getCustomerPaymentDetailView(customerDetails, null);
 
 
-        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecificationService.getCustomerSpecification(customerDetails));
+        CustomerSpecificationDTO customerSpecification = null;
+        if (nonNull(customerDetails.specification())) {
+
+            customerSpecification = customerSpecificationService.getCustomerSpecification(customerDetails.specification().id()).get();
+        }
+
+        KhatabookDetailsView khatabookDetails = new KhatabookDetailsView(khatabook, customerDetails, customerDairy, customerSpecification);
         final String customerLink = khatabookDetails.getCustomers().stream().findFirst().map(CustomerDTO::customerId).orElse(
                 null);
 
@@ -286,16 +281,18 @@ public class CustomerController {
         return ResponseEntity.ok(entityModel);
     }
 
-    @PatchMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", consumes = "application/json-patch+json")
-    public ResponseEntity<?> updatePartialCustomer(@PathVariable String khatabookId,
-                                                   @PathVariable String customerId,
-                                                   @RequestBody Map<String, Object> customerEntities) {
+    @PatchMapping(path = "/khatabook/{khatabookId}/v1/customer/{customerId}", consumes = "application/json-patch+json")
+    public ResponseEntity<?> updatePartialCustomer(
+            @RequestParam String version,
+            @PathVariable String khatabookId,
+            @PathVariable String customerId,
+            @RequestBody Map<String, Object> customerEntities) {
         final CustomerUpdatable customerDetails = myCustomerService.getByCustomerId(customerId).updatable();
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
-        if (Objects.isNull(khatabook)) {
+        if (isNull(khatabook)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
@@ -324,20 +321,20 @@ public class CustomerController {
             }
         }
 
-        final CustomerDTO updateCustomer = myCustomerService.saveAndUpdate(customerDetails.build());
+        final CustomerDTO updateCustomer = myCustomerService.update(customerDetails.build());
 
         return ResponseEntity.ok(updateCustomer);
     }
-
 
     private void updateSubEntityOfCustomerProduct(final CustomerUpdatable customerDetails,
                                                   final Field field,
                                                   final Object valueToSet) {
 
         switch (field.getGenericType().getTypeName()) {
-            case "java.util.List<com.generic.khatabook.model.Product>" -> updateCustomerProductUpdatable(
-                    customerDetails,
-                    (List<LinkedHashMap<String, Object>>) valueToSet);
+            case "java.util.List<com.generic.khatabook.model.Product>" ->
+                    updateCustomerProductUpdatable(
+                            customerDetails,
+                            (List<LinkedHashMap<String, Object>>) valueToSet);
             default ->
                     throw new com.generic.khatabook.common.exceptions.InvalidArgumentException(com.generic.khatabook.common.exceptions.AppEntity.CUSTOMER, field.getName());
         }
@@ -355,19 +352,45 @@ public class CustomerController {
             for (final Map.Entry<String, Object> customerProductSpecification : eachProduct.entrySet()) {
                 final Field eachField = ReflectionUtils.findField(Product.class,
                         customerProductSpecification.getKey());
-                if (Objects.isNull(eachField)) {
+                if (isNull(eachField)) {
                     throw new com.generic.khatabook.common.exceptions.InvalidArgumentException(com.generic.khatabook.common.exceptions.AppEntity.PRODUCT, eachField.getName());
                 }
                 ReflectionUtils.makeAccessible(eachField);
                 setValueInField(oldProductSpecification, customerProductSpecification.getValue(), eachField);
-                if (Objects.isNull(oldProductSpecification.getCustomerId())) {
+                if (isNull(oldProductSpecification.getCustomerId())) {
                     //  customerDetails.addProduct(oldProductSpecification);
                 }
             }
-            return customerDetails;
-
         }
-        return null;
+        return customerDetails;
+    }
+
+    @PatchMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", consumes = "application/json-patch+json")
+    public ResponseEntity<?> updatePartialCustomerV2(
+            @RequestParam String version,
+            @PathVariable String khatabookId,
+            @PathVariable String customerId,
+            @RequestBody CustomerDTO customerEntities) {
+        final CustomerUpdatable customerDetails = myCustomerService.getByCustomerId(customerId).updatable();
+        if (isNull(customerDetails)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
+        }
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        if (isNull(khatabook)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
+        }
+
+        if (nonNull(customerDetails.getProducts())) {
+            final ProblemDetail customerProductValidation = myCustomerValidation.doCustomerProductValidation(
+                    customerDetails.getProducts());
+            if (nonNull(customerProductValidation)) {
+                return ResponseEntity.of(customerProductValidation).build();
+            }
+        }
+
+        final CustomerDTO updateCustomer = myCustomerService.update(customerEntities);
+
+        return ResponseEntity.ok(updateCustomer);
     }
 
     private void setValueInField(final CustomerUpdatable oldProductSpecification,

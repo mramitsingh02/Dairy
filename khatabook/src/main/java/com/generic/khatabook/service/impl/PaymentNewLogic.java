@@ -32,7 +32,7 @@ public final class PaymentNewLogic {
         this.productClient = productClient;
     }
 
-    public PaymentsDTO calculateEachCustomerProduct(final CustomerDTO customerDTO, final PaymentDTO paymentDTO, List<ProductDTO> customerProducts, CustomerSpecificationDTO customerProductSpecification) {
+    public PaymentsDTO calculateEachCustomerProduct(final CustomerDTO customerDTO, final PaymentDTO paymentDTO, List<ProductDTO> customerProducts) {
         PaymentsDTO paymentDTOS = new PaymentsDTO();
         for (CustomerProductDTO customerPayment : paymentDTO.products()) {
             if (isNull(customerPayment.productId())) {
@@ -40,7 +40,7 @@ public final class PaymentNewLogic {
             } else {
                 for (ProductDTO customerProduct : customerProducts) {
                     if (customerProduct.id().equals(customerPayment.productId())) {
-                        paymentDTOS.add(new PaymentDTO(paymentDTO.to(), paymentDTO.from(), calculateEachCustomerProduct(customerDTO, customerPayment, customerProduct, customerProductSpecification)));
+                        paymentDTOS.add(new PaymentDTO(paymentDTO.to(), paymentDTO.from(), calculateEachCustomerProduct(customerDTO, customerPayment, customerProduct)));
                     }
                 }
             }
@@ -48,7 +48,7 @@ public final class PaymentNewLogic {
         return paymentDTOS;
     }
 
-    public CustomerProductDTO calculateEachCustomerProduct(final CustomerDTO customerDTO, final CustomerProductDTO customerPaymentProduct, ProductDTO customerProduct, CustomerSpecificationDTO customerProductSpecification) {
+    public CustomerProductDTO calculateEachCustomerProduct(final CustomerDTO customerDTO, final CustomerProductDTO customerPaymentProduct, ProductDTO customerProduct) {
         if (isNull(customerDTO)) {
             throw new InvalidArgumentValueException(AppEntity.CUSTOMER, "Not Found");
         }
@@ -62,8 +62,8 @@ public final class PaymentNewLogic {
         }
 
 
-        if (Objects.nonNull(customerProductSpecification)) {
-            return calculateCustomerPaymentBaseUponCustomerSpecification(customerPaymentProduct, customerProduct, customerProductSpecification);
+        if (Objects.nonNull(customerDTO.specification())) {
+            return calculateCustomerPaymentBaseUponCustomerSpecification(customerPaymentProduct, customerProduct, customerDTO.specification());
         }
 
         return customerPaymentProduct;

@@ -1,10 +1,7 @@
 package com.generic.khatabook.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -31,9 +28,8 @@ public class CustomerProductSpecification {
     private BigDecimal price;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(
-            name = "customer_specification_id",
-            referencedColumnName = "customerSpecificationId")
+    @JoinColumn(name = "customer_specification_id", referencedColumnName = "customerSpecificationId")
+    @ToString.Exclude
     private CustomerSpecification customerSpecification;
 
     private Long startUnit;

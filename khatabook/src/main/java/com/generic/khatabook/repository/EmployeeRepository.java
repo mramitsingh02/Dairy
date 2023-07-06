@@ -1,9 +1,9 @@
 package com.generic.khatabook.repository;
 
-import com.generic.khatabook.entity.CustomerSpecification;
+import com.generic.khatabook.entity.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CustomerSpecificationRepository extends JpaRepository<CustomerSpecification, String> {
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 }

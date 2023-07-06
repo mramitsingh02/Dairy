@@ -2,18 +2,20 @@ package com.generic.khatabook.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class CustomerDTOTest {
     @Test
     void testCustomer() {
         CustomerDTO customerDTO = CustomerDTO.of("customerId",
-                                                 "khatabookId",
-                                                 "9911805***",
-                                                 "Amit",
-                                                 "Singh",
-                                                 null,
-                                                 null);
+                "khatabookId",
+                "9911805***",
+                "Amit",
+                "Singh",
+                null,
+                null);
 
         assertEquals(customerDTO.customerId(), "customerId");
         assertEquals(customerDTO.khatabookId(), "khatabookId");
@@ -21,7 +23,7 @@ class CustomerDTOTest {
         assertEquals(customerDTO.firstName(), "Amit");
         assertEquals(customerDTO.lastName(), "Singh");
         assertNull(customerDTO.products());
-        assertNull(customerDTO.specificationId());
+        assertNull(customerDTO.specification());
     }
 
     @Test
@@ -41,14 +43,14 @@ class CustomerDTOTest {
         assertEquals(customerDTO.firstName(), customerDTOCopyOf.firstName());
         assertEquals(customerDTO.lastName(), customerDTOCopyOf.lastName());
         assertEquals(customerDTO.products(), customerDTOCopyOf.products());
-        assertEquals(customerDTO.specificationId(), customerDTOCopyOf.specificationId());
+        assertNull(customerDTO.specification());
 
 
         assertEquals("Amit Singh with 9911805*** belong to khatabookId.", customerDTO.toString());
         assertEquals("Amit Singh with 9911805*** and customer productId newId belong to khatabookId.",
                 customerDTOCopyOf.toString());
         assertEquals("Anonymous user with 9911805*** belong to khatabookId.",
-                     customerForAnonymous.toString());
+                customerForAnonymous.toString());
 
 
     }

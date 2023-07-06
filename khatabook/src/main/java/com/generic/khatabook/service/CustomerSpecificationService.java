@@ -2,6 +2,7 @@ package com.generic.khatabook.service;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
+import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.CustomerSpecificationDTO;
 import com.generic.khatabook.model.CustomerSpecificationUpdatable;
 
@@ -21,4 +22,5 @@ public interface CustomerSpecificationService {
 
     CustomerSpecificationDTO update(CustomerSpecificationDTO build);
 
+    void mergeSpecification(CustomerDTO customerDetails, CustomerSpecificationDTO customerSpecificationDTO);
 }

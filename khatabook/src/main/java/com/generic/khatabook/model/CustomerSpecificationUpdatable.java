@@ -27,6 +27,18 @@ public class CustomerSpecificationUpdatable {
     private LocalDateTime updatedOn;
     private LocalDateTime deletedOn;
 
+    public CustomerSpecificationUpdatable(CustomerSpecificationDTO dto) {
+        this(dto.id(), dto.name(), dto.description(), dto.version(), null, null, dto.specificationFor(), chengeProd(dto.products()), dto.createdOn(), dto.updateOn(), dto.deleteOn());
+    }
+
+    private static List<CustomerProductSpecificationUpdatable> chengeProd(List<CustomerProductSpecificationDTO> products) {
+        return products.stream().map(CustomerSpecificationUpdatable::changeProductUpdatable).collect(Collectors.toList());
+    }
+
+    private static CustomerProductSpecificationUpdatable changeProductUpdatable(CustomerProductSpecificationDTO customerProductSpecificationDTO) {
+        return new CustomerProductSpecificationUpdatable(customerProductSpecificationDTO);
+    }
+
     public CustomerSpecificationDTO build() {
         List<CustomerProductSpecificationDTO> newProducts = Collections.emptyList();
         final List<CustomerProductSpecificationUpdatable> products = this.products;
@@ -34,9 +46,8 @@ public class CustomerSpecificationUpdatable {
             newProducts = products.stream().map(CustomerProductSpecificationUpdatable::build).collect(Collectors.toList());
         }
 
-        return new CustomerSpecificationDTO(this.id, this.name, this.description, this.version, this.khatabookId,
-                                            this.customerId, this.specificationFor, newProducts, createdOn,
-                                            updatedOn, deletedOn);
+        return new CustomerSpecificationDTO(this.id, this.name, this.description, this.version, this.specificationFor, newProducts, createdOn,
+                updatedOn, deletedOn);
     }
 
     public CustomerProductSpecificationUpdatable getProducts(String productId) {

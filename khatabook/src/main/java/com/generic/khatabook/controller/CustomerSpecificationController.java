@@ -1,9 +1,6 @@
 package com.generic.khatabook.controller;
 
-import com.generic.khatabook.common.exceptions.AppEntity;
-import com.generic.khatabook.common.exceptions.DuplicateFoundException;
-import com.generic.khatabook.common.exceptions.InvalidArgumentException;
-import com.generic.khatabook.common.exceptions.NotFoundException;
+import com.generic.khatabook.common.exceptions.*;
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
 import com.generic.khatabook.model.*;
@@ -23,6 +20,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @RestController
@@ -53,19 +51,28 @@ public class CustomerSpecificationController {
 
 
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
-        if (Objects.isNull(customerDetails)) {
+        if (isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
         }
         if (!Objects.equals(khatabookId, customerDetails.khatabookId())) {
             return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
 
+        if (nonNull(customerDetails.specification())) {
+            return ResponseEntity.of(new ResourceFoundException(AppEntity.CUSTOMER_SPECIFICATION,
+                    customerDetails.specification().id()).get()).build();
+        }
 
-        customerSpecificationDTO = customerSpecificationDTO.copyOf(myIdGeneratorService.generateId(), khatabookId,
-                customerId);
+
+        customerSpecificationDTO = customerSpecificationDTO.copyOf(myIdGeneratorService.generateId());
 
         ResponseEntity<?> checkForDuplicateRequestCreation = checkForDuplicateRequestCreation(customerSpecificationDTO);
-        if (checkForDuplicateRequestCreation.getStatusCode() != HttpStatus.OK) return checkForDuplicateRequestCreation;
+        if (checkForDuplicateRequestCreation.getStatusCode()!=HttpStatus.OK)
+            return checkForDuplicateRequestCreation;
+
+
+        myCustomerSpecificationService.mergeSpecification(customerDetails, customerSpecificationDTO);
+
 
         final CustomerSpecificationDTO saved = myCustomerSpecificationService.save(customerSpecificationDTO);
 
@@ -78,13 +85,10 @@ public class CustomerSpecificationController {
 
     private ResponseEntity<Object> checkForDuplicateRequestCreation(final CustomerSpecificationDTO customerSpecificationDTO) {
 
-        if (Objects.isNull(customerSpecificationDTO.id())) {
+        if (isNull(customerSpecificationDTO.id())) {
             return ResponseEntity.ok().build();
         }
-
-        final Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> customerSpecificationExists = myCustomerSpecificationService.get(
-                customerSpecificationDTO.id());
-        if (customerSpecificationExists.isPresent()) {
+        if (myCustomerSpecificationService.get(customerSpecificationDTO.id()).isPresent()) {
             return ResponseEntity.of(new DuplicateFoundException(AppEntity.CUSTOMER_SPECIFICATION,
                     customerSpecificationDTO.id()).get()).build();
         }
@@ -131,14 +135,11 @@ public class CustomerSpecificationController {
 
         final CustomerSpecificationUpdatable entityModel = myCustomerSpecificationService.getCustomerSpecification(
                 specificationId).updatable();
-        if (Objects.isNull(entityModel)) {
+        if (isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER_SPECIFICATION,
                     specificationId).get()).build();
         }
 
-        if (nonNull(dto.customerId())) {
-            entityModel.setCustomerId(dto.customerId());
-        }
         if (nonNull(dto.description())) {
             entityModel.setCustomerId(dto.description());
         }
@@ -174,7 +175,7 @@ public class CustomerSpecificationController {
 
         final CustomerSpecificationUpdatable entityModel = myCustomerSpecificationService.getCustomerSpecification(
                 specificationId).updatable();
-        if (Objects.isNull(entityModel)) {
+        if (isNull(entityModel)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER_SPECIFICATION,
                     specificationId).get()).build();
         }
@@ -210,7 +211,8 @@ public class CustomerSpecificationController {
                     updateCustomerProductSpecificationUpdatable(
                             entityModel,
                             (List<LinkedHashMap<String, Object>>) valueToSet);
-            default -> throw new InvalidArgumentException(AppEntity.CUSTOMER_SPECIFICATION, field.getName());
+            default ->
+                    throw new InvalidArgumentException(AppEntity.CUSTOMER_SPECIFICATION, field.getName());
         }
     }
 
@@ -225,12 +227,12 @@ public class CustomerSpecificationController {
             for (final Map.Entry<String, Object> customerProductSpecification : eachProduct.entrySet()) {
                 final Field eachField = ReflectionUtils.findField(CustomerProductSpecificationUpdatable.class,
                         customerProductSpecification.getKey());
-                if (Objects.isNull(eachField)) {
+                if (isNull(eachField)) {
                     throw new InvalidArgumentException(AppEntity.CUSTOMER_SPECIFICATION, eachField.getName());
                 }
                 ReflectionUtils.makeAccessible(eachField);
                 setValueInField(oldProductSpecification, customerProductSpecification.getValue(), eachField);
-                if (Objects.isNull(oldProductSpecification.getId())) {
+                if (isNull(oldProductSpecification.getId())) {
                     entityModel.addProduct(oldProductSpecification);
                 }
             }

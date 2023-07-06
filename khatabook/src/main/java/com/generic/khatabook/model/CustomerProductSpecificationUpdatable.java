@@ -12,6 +12,10 @@ public class CustomerProductSpecificationUpdatable {
     private UnitOfValue unitOfValue;
     private UnitOfMeasurement unitOfMeasurement;
 
+    public CustomerProductSpecificationUpdatable(CustomerProductSpecificationDTO dto) {
+        this(dto.id(), dto.productId(), dto.quantity(), dto.unitOfValue(), dto.unitOfMeasurement());
+    }
+
     public CustomerProductSpecificationDTO build() {
         return new CustomerProductSpecificationDTO(this.id, this.productId, this.quantity, unitOfValue, unitOfMeasurement);
     }

@@ -1,6 +1,10 @@
 package com.generic.khatabook.model;
 
-public record CustomerProductSpecificationDTO(String id, String productId, float quantity, UnitOfValue unitOfValue,
+import java.util.Objects;
+
+public record CustomerProductSpecificationDTO(String id, String productId,
+                                              float quantity,
+                                              UnitOfValue unitOfValue,
                                               UnitOfMeasurement unitOfMeasurement) {
 
 
@@ -13,5 +17,8 @@ public record CustomerProductSpecificationDTO(String id, String productId, float
                 this.unitOfMeasurement);
     }
 
+    public boolean hasCustomerSpecificPrice() {
+        return Objects.nonNull(unitOfValue()) && Objects.nonNull(unitOfValue().price());
+    }
 }
 

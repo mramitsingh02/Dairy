@@ -24,7 +24,7 @@ public class CustomerProduct {
     private Long Id;
     @Transient
     private String productName;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", referencedColumnName = "customerId")
     private Customer customer;
     private String productId;

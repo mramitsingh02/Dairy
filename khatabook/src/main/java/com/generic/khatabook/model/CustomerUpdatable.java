@@ -5,6 +5,8 @@ import lombok.Data;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Data
 @AllArgsConstructor
 public class CustomerUpdatable {
@@ -14,10 +16,13 @@ public class CustomerUpdatable {
     private String firstName;
     private String lastName;
     private List<Product> products;
-    private String specificationId;
+    private CustomerSpecificationUpdatable specification;
 
     public CustomerDTO build() {
-        return new CustomerDTO(this.customerId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.products, this.specificationId);
+        if (isNull(specification)) {
+            return new CustomerDTO(this.customerId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.products, null);
+        }
+        return new CustomerDTO(this.customerId, this.khatabookId, this.msisdn, this.firstName, this.lastName, this.products, this.specification.build());
     }
 
     public CustomerUpdatable addProduct(String productId, String name) {

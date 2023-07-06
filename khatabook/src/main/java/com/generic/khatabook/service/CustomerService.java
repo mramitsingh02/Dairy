@@ -1,11 +1,11 @@
 package com.generic.khatabook.service;
 
+import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.model.CustomerDTO;
 import com.generic.khatabook.model.CustomerUpdatable;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
-import com.generic.khatabook.common.model.Container;
 
 @Component
 public interface CustomerService {
@@ -15,7 +15,9 @@ public interface CustomerService {
 
     CustomerDTO getByMsisdn(String msisdn);
 
-    CustomerDTO saveAndUpdate(CustomerDTO customerDTO);
+    CustomerDTO save(CustomerDTO customerDTO);
+
+    CustomerDTO update(CustomerDTO customerDTO);
 
     CustomerDTO delete(String customerId, String msidn);
 

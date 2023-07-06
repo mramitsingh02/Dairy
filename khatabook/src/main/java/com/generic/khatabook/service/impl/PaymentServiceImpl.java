@@ -9,7 +9,6 @@ import com.generic.khatabook.repository.PaymentRepository;
 import com.generic.khatabook.service.PaymentService;
 import com.generic.khatabook.service.ProductService;
 import com.generic.khatabook.service.mapper.CustomerPaymentMapper;
-import com.generic.khatabook.service.proxy.CustomerSpecificationService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +30,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private CustomerPaymentMapper customerPaymentMapper;
     @Autowired
-    private CustomerSpecificationService customerSpecificationService;
-
-    @Autowired
     private ProductService productService;
 
     @Autowired
@@ -53,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         log.info("Save Payment for khatabook {}", khatabookDTO.khatabookId());
 
-        PaymentsDTO finalPayments = paymentLogic.calculateEachCustomerProduct(customerDTO, paymentDTO, productService.getCustomerProducts(customerDTO.products()), customerSpecificationService.getCustomerSpecification(customerDTO));
+        PaymentsDTO finalPayments = paymentLogic.calculateEachCustomerProduct(customerDTO, paymentDTO, productService.getCustomerProducts(customerDTO.products()));
         if (!finalPayments.hasAmounts()) {
             throw new InvalidArgumentValueException(AppEntity.AMOUNT, "pass the +ve value.");
         }
