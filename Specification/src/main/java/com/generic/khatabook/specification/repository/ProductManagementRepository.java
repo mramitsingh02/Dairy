@@ -10,4 +10,6 @@ import java.util.List;
 public interface ProductManagementRepository extends JpaRepository<Product, String> {
 
     List<Product> findByName(String name);
+
+    List<Product> findByUnitOfMeasurement(final String unitOfMeasurement);
 }

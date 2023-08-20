@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductManagementService {
 
-    List<ProductDTO> getAllProducts();
+    List<ProductDTO> findAllProducts();
 
     List<ProductDTO> findProductByName(String productName);
 
@@ -22,4 +22,10 @@ public interface ProductManagementService {
     ProductDTO updateProduct(ProductDTO entityModel);
 
     void saveProductRating(ProductRatingDTO productRatingDTO);
+
+    List<ProductRatingDTO> findProductRatingByProductId(String productId);
+
+    List<ProductRatingDTO> findProductRatingByCustomerId(String customerId);
+
+    List<ProductDTO> findProductByUnitOfMeasurement(String unitOfMeasurement);
 }

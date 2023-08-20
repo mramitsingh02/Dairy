@@ -11,14 +11,19 @@ public class NotFoundException extends RuntimeException {
         super(appEntity.getName() + " " + id + " not fount!.");
     }
 
+    public NotFoundException(final AppEntity appEntity, SubEntity entity, final String id) {
+        super(appEntity.getName() + "." + entity.getName() + " " + id + " not fount!.");
+    }
+
     public NotFoundException(final AppEntity appEntity, final Long id) {
         this(appEntity, String.valueOf(id));
     }
 
     public NotFoundException(final AppEntity khatabook, final AppEntity customer, final String khatabookId,
-                             final String customerId) {
+                             final String customerId)
+    {
         super(khatabook.getName() + " " + khatabookId + " and " + customer.getName() + " " + customerId + " not " +
-                      "fount!.");
+                "fount!.");
     }
 
     public ProblemDetail get(){

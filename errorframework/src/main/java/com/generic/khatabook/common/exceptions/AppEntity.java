@@ -9,11 +9,14 @@ public enum AppEntity {
     SPECIFICATION("Specification"),
     CUSTOMER_SPECIFICATION("Customer Specification"),
     CUSTOMER("Customer"),
-    MSISDN("Mobile");
+    MSISDN("Mobile"),
+    OTHER("");
     private String myName;
+    private SubEntity[] mySubEntity;
 
-    AppEntity(final String name) {
+    AppEntity(final String name, SubEntity... subEntity) {
         myName = name;
+        mySubEntity = subEntity;
     }
 
     public String getName() {
@@ -27,5 +30,9 @@ public enum AppEntity {
 
     public AppEntity or(final AppEntity customer) {
         return null;
+    }
+
+    public AppEntity and(final AppEntity other) {
+        return AppEntity.valueOf(name() + "." + other.getName());
     }
 }

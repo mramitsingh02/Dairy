@@ -4,9 +4,18 @@ import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.InvalidArgumentException;
 import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.exchanger.SpecificationClient;
-import com.generic.khatabook.model.*;
-import com.generic.khatabook.service.*;
+import com.generic.khatabook.model.CustomerDTO;
+import com.generic.khatabook.model.CustomerSpecificationDTO;
+import com.generic.khatabook.model.CustomerUpdatable;
+import com.generic.khatabook.model.KhatabookDetails;
+import com.generic.khatabook.model.KhatabookDetailsView;
+import com.generic.khatabook.model.KhatabookPaymentSummaryView;
+import com.generic.khatabook.model.PaymentDTO;
+import com.generic.khatabook.model.Product;
+import com.generic.khatabook.service.CustomerService;
+import com.generic.khatabook.service.CustomerSpecificationService;
+import com.generic.khatabook.service.KhatabookService;
+import com.generic.khatabook.service.PaymentService;
 import com.generic.khatabook.validator.CustomerValidation;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +24,15 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.lang.reflect.Field;
@@ -42,11 +59,6 @@ public class CustomerController {
 
     @Autowired
     private PaymentService myPaymentService;
-    @Autowired
-    private SpecificationClient mySpecificationClient;
-
-    @Autowired
-    private IdGeneratorService myIdGeneratorService;
 
     @Autowired
     private CustomerValidation myCustomerValidation;
@@ -94,7 +106,7 @@ public class CustomerController {
                 customerDTO.customerId()).toUri()).body(entityModel);
     }
 
-    @GetMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", produces = {"application/hal+json"})
+    @GetMapping(path = "/khatabook/{khatabookId}/customer/{customerId}", produces = {"application/json"})
     public ResponseEntity<?> getCustomerByCustomerId(
             @RequestParam(required = false, defaultValue = "desc") String sorting,
             @RequestParam(required = false, defaultValue = "date") String sortingBy,
@@ -102,7 +114,7 @@ public class CustomerController {
             @PathVariable String customerId
 
     ) {
-
+//amit testing not done
 
         if (nonNull(sorting) && !isSortingPossibleValueValid(sorting)) {
             return ResponseEntity.of(new InvalidArgumentValueException(SORTING_MSG.formatted(sorting, ASC_DESC)).get()).build();
@@ -114,13 +126,13 @@ public class CustomerController {
         }
 
 
+        val khatabook = myKhatabookService.getKhatabookByKhatabookId(khatabookId);
+        if (isNull(khatabook)) {
+            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
+        }
         final CustomerDTO customerDetails = myCustomerService.getByCustomerId(customerId).get();
         if (isNull(customerDetails)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.CUSTOMER, customerId).get()).build();
-        }
-        val khatabook = myKhatabookService.getKhatabookByKhatabookId(customerDetails.khatabookId());
-        if (isNull(khatabook)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.KHATABOOK, khatabookId).get()).build();
         }
         CustomerSpecificationDTO customerSpecification = null;
         if (nonNull(customerDetails.specification())) {

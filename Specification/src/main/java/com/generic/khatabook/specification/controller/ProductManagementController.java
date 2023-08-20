@@ -1,12 +1,15 @@
 package com.generic.khatabook.specification.controller;
 
 import com.generic.khatabook.common.exceptions.AppEntity;
+import com.generic.khatabook.common.exceptions.IllegalArgumentException;
 import com.generic.khatabook.common.exceptions.InvalidArgumentException;
 import com.generic.khatabook.common.exceptions.LimitBonusException;
 import com.generic.khatabook.common.exceptions.NotFoundException;
 import com.generic.khatabook.specification.model.ProductDTO;
 import com.generic.khatabook.specification.model.ProductRatingDTO;
+import com.generic.khatabook.specification.model.ProductRatingViews;
 import com.generic.khatabook.specification.model.ProductUpdatable;
+import com.generic.khatabook.specification.model.ProductViews;
 import com.generic.khatabook.specification.services.IdGeneratorService;
 import com.generic.khatabook.specification.services.ProductManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,15 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.lang.reflect.Field;
@@ -36,15 +47,10 @@ public class ProductManagementController {
         this.myIdGeneratorService = idGeneratorService;
     }
 
-
-    @GetMapping(path = "/products")
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-
-        return ResponseEntity.ok(myProductManagementService.getAllProducts());
-    }
-
     @PostMapping("/product/{productId}/rating")
-    public ResponseEntity<?> saveProductRating(@RequestBody ProductRatingDTO productRatingDTO) {
+    public ResponseEntity<?> saveProductRating(@PathVariable String productId,
+                                               @RequestBody ProductRatingDTO productRatingDTO)
+    {
         final ProductDTO product = myProductManagementService.findProductById(productRatingDTO.productId()).get();
         if (Objects.isNull(product)) {
             return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productRatingDTO.productId()).get()).build();
@@ -55,9 +61,28 @@ public class ProductManagementController {
             return ResponseEntity.of(new LimitBonusException(AppEntity.PRODUCT, LimitBonusException.Limit.MIN, productRatingDTO.rating()).get()).build();
         }
         myProductManagementService.saveProductRating(productRatingDTO.copyOf(myIdGeneratorService.generateId()));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{productId}").buildAndExpand(product.id()).toUri()).body(productRatingDTO);
     }
 
+    @GetMapping("/product/{productId}/rating")
+    public ResponseEntity<?> getProductRating(@PathVariable String productId) {
+        final List<ProductRatingDTO> productRatings =
+                myProductManagementService.findProductRatingByProductId(productId);
+        if (Objects.isNull(productRatings) || productRatings.isEmpty()) {
+            return ResponseEntity.ok(new ProductRatingViews(productId));
+        }
+        return ResponseEntity.ok(new ProductRatingViews(productRatings));
+    }
+
+    @PostMapping(path = "/products")
+    public ResponseEntity<?> createAll(@RequestBody List<ProductDTO> products) {
+
+        if (Objects.nonNull(products) && !products.isEmpty()) {
+            products.parallelStream().forEach(this::create);
+            return ResponseEntity.accepted().build();
+        }
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping(path = "/product")
     public ResponseEntity<?> create(@RequestBody ProductDTO product) {
@@ -73,16 +98,6 @@ public class ProductManagementController {
         }
     }
 
-    @PostMapping(path = "/products")
-    public ResponseEntity<?> createAll(@RequestBody List<ProductDTO> products) {
-
-        if (Objects.nonNull(products)) {
-            products.parallelStream().forEach(this::create);
-            return ResponseEntity.accepted().build();
-        }
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/product/{productId}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable String productId) {
         final ProductDTO entityModel = myProductManagementService.findProductById(productId).get();
@@ -92,6 +107,36 @@ public class ProductManagementController {
 
         return ResponseEntity.ok(entityModel);
     }
+
+    @GetMapping("/product/")
+    public ResponseEntity<ProductViews> searchProductByQuery(@RequestParam(required = false) String name,
+                                                             @RequestParam(required = false) String unitOfMeasurement)
+    {
+
+        List<ProductDTO> products = null;
+        try {
+            if (Objects.nonNull(name)) {
+                products = myProductManagementService.findProductByName(name);
+            } else if (Objects.nonNull(unitOfMeasurement)) {
+                products = myProductManagementService.findProductByUnitOfMeasurement(unitOfMeasurement);
+            } else {
+                return getAllProducts();
+            }
+            if (Objects.isNull(products)) {
+                return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, name).get()).build();
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.of(e.get()).build();
+        }
+        return ResponseEntity.ok(new ProductViews(products));
+    }
+
+    @GetMapping(path = "/products")
+    public ResponseEntity<ProductViews> getAllProducts() {
+
+        return ResponseEntity.ok(new ProductViews(myProductManagementService.findAllProducts()));
+    }
+
 
     @DeleteMapping("/product/{productId}")
     public ResponseEntity<ProductDTO> deleteProductById(@PathVariable String productId) {
@@ -111,8 +156,8 @@ public class ProductManagementController {
             return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productId).get()).build();
         }
 
-        myProductManagementService.updateProduct(product);
-        return ResponseEntity.ok().build();
+        final ProductDTO productDTO = myProductManagementService.updateProduct(product);
+        return ResponseEntity.ok(productDTO);
     }
 
     @PatchMapping(path = "/product/{productId}", consumes = "application/json-patch+json")

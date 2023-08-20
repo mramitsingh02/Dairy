@@ -20,7 +20,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -139,33 +144,40 @@ public class CustomerServiceImpl implements CustomerService {
 
     private void updateCustomerSpecification(CustomerSpecification customerSpecification, CustomerSpecification updatableCustomerSpecification) {
         if (nonNull(updatableCustomerSpecification)) {
-            customerSpecification.setSpecificationName(updatableCustomerSpecification.getSpecificationName());
-            customerSpecification.setSpecificationFor(updatableCustomerSpecification.getSpecificationFor());
+            if (!Objects.equals(customerSpecification.getSpecificationName(), updatableCustomerSpecification.getSpecificationName())) {
+                customerSpecification.setSpecificationName(updatableCustomerSpecification.getSpecificationName());
+            }
+            if (!Objects.equals(customerSpecification.getSpecificationFor(), updatableCustomerSpecification.getSpecificationFor())) {
+                customerSpecification.setSpecificationFor(updatableCustomerSpecification.getSpecificationFor());
+            }
+            if (!Objects.equals(customerSpecification.getDescription(), updatableCustomerSpecification.getDescription())) {
+                customerSpecification.setDescription(updatableCustomerSpecification.getDescription());
+            }
             customerSpecification.setUpdatedOn(updatableCustomerSpecification.getUpdatedOn());
-            customerSpecification.setDescription(updatableCustomerSpecification.getDescription());
         }
     }
 
     private void updateCustomerProductSpecifications(Customer existingCustomer, List<ProductDTO> updatableProduct, CustomerSpecification customerSpecification) {
         if (nonNull(customerSpecification)) {
-            List<CustomerProductSpecification> customerExistProductSpecifications = existingCustomer.getCustomerSpecification().getCustomerProductSpecifications();
-            List<CustomerProductSpecification> customerUpdateableProductSpecifications = customerSpecification.getCustomerProductSpecifications();
-            if (nonNull(customerUpdateableProductSpecifications)) {
-                List<CustomerProductSpecification> collectAllSpecificationProducts = new ArrayList<>();
-
-                for (CustomerProductSpecification matchProductSpecification : customerUpdateableProductSpecifications) {
-
-                    customerExistProductSpecifications.stream().filter(x -> x.getProductId().equals(matchProductSpecification.getProductId())).map(x -> mergeProductSpecification(x, matchProductSpecification)).forEach(collectAllSpecificationProducts::add);
-                }
-                updatableProduct.stream()
-                        .filter(x -> collectAllSpecificationProducts.stream().allMatch(p -> x.id().equals(p.getProductId())))
-                        .map(x -> createDefaultProductSpecification(customerSpecification, x)).forEach(collectAllSpecificationProducts::add);
-
-                List<CustomerProductSpecification> selectedUniqueProducts = new ArrayList<>(collectAllSpecificationProducts.stream().collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(CustomerProductSpecification::getProductId)))));
-                customerSpecification.setCustomerProductSpecifications(selectedUniqueProducts);
+            CustomerSpecification existingCustomerSpecification = existingCustomer.getCustomerSpecification();
+            List<CustomerProductSpecification> customerExistProductSpecifications = existingCustomerSpecification.getCustomerProductSpecifications();
+            List<CustomerProductSpecification> customerUpdatableProductSpecifications = customerSpecification.getCustomerProductSpecifications();
+            if (nonNull(customerUpdatableProductSpecifications)) {
+                //merge with existing product specification
+                customerUpdatableProductSpecifications.forEach(updatable -> customerExistProductSpecifications.stream().filter(x -> x.getProductId().equals(updatable.getProductId())).forEach(existing -> mergeProductSpecification(existing, updatable)));
+                // create new product specification for new product
+                customerUpdatableProductSpecifications.stream()
+                        .filter(product -> existingCustomer.getProducts().stream().anyMatch(customerProduct -> customerProduct.getProductId().equals(product.getProductId())))
+                        .filter(updatable -> customerExistProductSpecifications.stream().noneMatch(existing -> existing.getProductId().equals(updatable.getProductId()))).map(updatable -> createProductSpecification(updatable, existingCustomerSpecification)).forEach(customerExistProductSpecifications::add);
             }
-            customerSpecification.setCustomer(existingCustomer);
-            existingCustomer.setCustomerSpecification(customerSpecification);
+
+
+            //                updatableProduct.stream().filter(x -> collectAllSpecificationProducts.stream().allMatch(p -> x.id().equals(p.getProductId()))).map(x -> createDefaultProductSpecification(customerSpecification, x)).forEach(customerExistProductSpecifications::add);
+
+//                List<CustomerProductSpecification> selectedUniqueProducts = new ArrayList<>(collectAllSpecificationProducts.stream().collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(CustomerProductSpecification::getProductId)))));
+//                customerSpecification.setCustomerProductSpecifications(selectedUniqueProducts);
+//            customerSpecification.setCustomer(existingCustomer);
+//            existingCustomer.setCustomerSpecification(customerSpecification);
         }
     }
 
@@ -180,18 +192,23 @@ public class CustomerServiceImpl implements CustomerService {
                 customerProductSpecification.setQuantity(matchProductSpecification.getQuantity());
 
             }
-      /*      if (!Objects.equals(customerProductSpecification.getStartUnit(), matchProductSpecification.getStartUnit())) {
+            if (!Objects.equals(customerProductSpecification.getStartUnit(), matchProductSpecification.getStartUnit())) {
                 customerProductSpecification.setStartUnit(matchProductSpecification.getStartUnit());
 
             }
             if (!Objects.equals(customerProductSpecification.getEndUnit(), matchProductSpecification.getEndUnit())) {
                 customerProductSpecification.setEndUnit(matchProductSpecification.getEndUnit());
-            }*/
+            }
 
         }
 
         return customerProductSpecification;
 
+    }
+
+    private CustomerProductSpecification createProductSpecification(CustomerProductSpecification updatable, CustomerSpecification customerSpec) {
+
+        return CustomerProductSpecification.builder().productId(updatable.getProductId()).quantity(updatable.getQuantity()).unitOfMeasurement(updatable.getUnitOfMeasurement()).price(updatable.getPrice()).customerSpecification(customerSpec).build();
     }
 
     private CustomerProductSpecification createDefaultProductSpecification(CustomerSpecification systemDefault, ProductDTO dto) {

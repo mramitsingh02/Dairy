@@ -1,7 +1,7 @@
 package com.generic.khatabook.specification.model;
 
-public record ProductRatingDTO(String productId, float rating, String description) {
-    public ProductRatingDTO copyOf(final String productId) {
-        return new ProductRatingDTO(productId, rating, description);
+public record ProductRatingDTO(String id, String customerId, String productId, float rating, String description) {
+    public ProductRatingDTO copyOf(final String id) {
+        return new ProductRatingDTO(id, customerId, productId, rating, description);
     }
 }
