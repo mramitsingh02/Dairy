@@ -11,12 +11,9 @@ public enum AppEntity {
     CUSTOMER("Customer"),
     MSISDN("Mobile"),
     OTHER("");
-    private String myName;
-    private SubEntity[] mySubEntity;
-
-    AppEntity(final String name, SubEntity... subEntity) {
+    private final String myName;
+    AppEntity(final String name) {
         myName = name;
-        mySubEntity = subEntity;
     }
 
     public String getName() {

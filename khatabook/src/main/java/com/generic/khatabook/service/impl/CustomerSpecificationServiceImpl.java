@@ -4,11 +4,11 @@ import com.generic.khatabook.common.exceptions.AppEntity;
 import com.generic.khatabook.common.exceptions.DuplicateFoundException;
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationUpdatable;
 import com.generic.khatabook.entity.Customer;
 import com.generic.khatabook.entity.CustomerSpecification;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerSpecificationDTO;
-import com.generic.khatabook.model.CustomerSpecificationUpdatable;
 import com.generic.khatabook.repository.CustomerRepository;
 import com.generic.khatabook.repository.CustomerSpecificationRepository;
 import com.generic.khatabook.service.CustomerSpecificationService;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static java.util.Objects.isNull;
-
 @Service
 public class CustomerSpecificationServiceImpl implements CustomerSpecificationService {
 

@@ -1,7 +1,7 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.Product;
-import com.generic.khatabook.model.ProductDTO;
+import com.generic.khatabook.common.model.Product;
+import com.generic.khatabook.common.model.ProductDTO;
 
 import java.util.Collections;
 import java.util.List;

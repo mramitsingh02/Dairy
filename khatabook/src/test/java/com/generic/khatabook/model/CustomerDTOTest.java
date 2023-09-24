@@ -1,11 +1,11 @@
 package com.generic.khatabook.model;
 
+import com.generic.khatabook.common.model.CustomerDTO;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
 class CustomerDTOTest {
     @Test
     void testCustomer() {

@@ -1,7 +1,7 @@
 package com.generic.khatabook.service.impl;
 
+import com.generic.khatabook.common.model.OperatorDTO;
 import com.generic.khatabook.entity.Operator;
-import com.generic.khatabook.model.OperatorDTO;
 import com.generic.khatabook.repository.OperatorRepository;
 import com.generic.khatabook.service.OperatorService;
 import com.generic.khatabook.service.mapper.OperatorMapper;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
 @Slf4j
 public class OperatorServiceImpl implements OperatorService {

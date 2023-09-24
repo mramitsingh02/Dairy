@@ -2,10 +2,9 @@ package com.generic.khatabook.service;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerSpecificationDTO;
-import com.generic.khatabook.model.CustomerSpecificationUpdatable;
-
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationUpdatable;
 public interface CustomerSpecificationService {
 
     Container<CustomerSpecificationDTO, CustomerSpecificationUpdatable> get(String id);

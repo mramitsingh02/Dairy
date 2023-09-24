@@ -1,13 +1,13 @@
 package com.generic.khatabook.service.impl;
 
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.Product;
 import com.generic.khatabook.entity.Customer;
 import com.generic.khatabook.entity.CustomerProduct;
 import com.generic.khatabook.entity.CustomerSpecification;
 import com.generic.khatabook.factory.CustomerSpecificationFactory;
 import com.generic.khatabook.factory.ProductFactory;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerSpecificationDTO;
-import com.generic.khatabook.model.Product;
 import com.generic.khatabook.repository.CustomerRepository;
 import com.generic.khatabook.service.ProductService;
 import com.generic.khatabook.service.mapper.CustomerMapper;
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;

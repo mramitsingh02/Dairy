@@ -1,6 +1,12 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.*;
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.KhatabookDTO;
+import com.generic.khatabook.common.model.KhatabookPaymentSummary;
+import com.generic.khatabook.common.model.KhatabookPaymentSummaryView;
+import com.generic.khatabook.common.model.PaymentDTO;
+import com.generic.khatabook.common.model.PaymentType;
 
 public interface PaymentService {
     public KhatabookPaymentSummary getPaymentDetailByKhatabookId(String khatabookId);

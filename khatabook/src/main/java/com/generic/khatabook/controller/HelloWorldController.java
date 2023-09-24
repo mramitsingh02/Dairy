@@ -1,8 +1,8 @@
 package com.generic.khatabook.controller;
 
+import com.generic.khatabook.common.model.Greeting;
 import com.generic.khatabook.entity.Employee;
 import com.generic.khatabook.entity.WorkStation;
-import com.generic.khatabook.model.Greeting;
 import com.generic.khatabook.repository.EmployeeRepository;
 import com.generic.khatabook.repository.WorkStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;

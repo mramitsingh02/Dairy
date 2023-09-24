@@ -1,14 +1,13 @@
 package com.generic.khatabook.service.mapper;
 
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.KhatabookGroupDTO;
 import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.entity.KhatabookGroup;
 import com.generic.khatabook.entity.Operator;
-import com.generic.khatabook.model.KhatabookGroupDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-
 @Component
 public class KhatabookGroupMapper implements Mapper<KhatabookGroup, KhatabookGroupDTO, Void> {
 

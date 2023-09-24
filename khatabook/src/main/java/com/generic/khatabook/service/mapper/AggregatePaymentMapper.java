@@ -1,14 +1,13 @@
 package com.generic.khatabook.service.mapper;
 
+import com.generic.khatabook.common.model.AggregatePaymentDTO;
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.CustomerDTO;
 import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.entity.AggregatePayment;
-import com.generic.khatabook.model.AggregatePaymentDTO;
-import com.generic.khatabook.model.CustomerDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-
 @Component
 public class AggregatePaymentMapper implements Mapper<AggregatePayment, AggregatePaymentDTO, Void> {
 

@@ -1,17 +1,16 @@
 package com.generic.khatabook.service.mapper;
 
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.CustomerProductSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerProductSpecificationUpdatable;
 import com.generic.khatabook.common.model.Mapper;
+import com.generic.khatabook.common.model.UnitOfMeasurement;
+import com.generic.khatabook.common.model.UnitOfValue;
 import com.generic.khatabook.entity.CustomerProductSpecification;
-import com.generic.khatabook.model.CustomerProductSpecificationDTO;
-import com.generic.khatabook.model.CustomerProductSpecificationUpdatable;
-import com.generic.khatabook.model.UnitOfMeasurement;
-import com.generic.khatabook.model.UnitOfValue;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Objects;
-
 @Component
 public class CustomerProductSpecificationMapper implements Mapper<CustomerProductSpecification, CustomerProductSpecificationDTO, CustomerProductSpecificationUpdatable> {
     @Override

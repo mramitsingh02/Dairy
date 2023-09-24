@@ -12,11 +12,13 @@
         <module name="liquidbook" />
         <module name="common" />
         <module name="errorframework" />
+        <module name="review-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Dairy" target="1.5" />
       <module name="errorframework (1)" target="17" />
+      <module name="review-services" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -26,6 +28,8 @@
       <module name="errorframework (1)" options="-parameters" />
       <module name="khatabook" options="-parameters" />
       <module name="liquidbook" options="-parameters" />
+      <module name="review-service" options="-parameters" />
+      <module name="review-services" options="-parameters" />
       <module name="specification" options="-parameters" />
     </option>
   </component>

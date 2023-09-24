@@ -1,13 +1,17 @@
 package com.generic.khatabook.factory;
 
+import com.generic.khatabook.common.model.Product;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.UnitOfMeasurement;
 import com.generic.khatabook.entity.CustomerProduct;
-import com.generic.khatabook.model.Product;
-import com.generic.khatabook.model.ProductDTO;
-import com.generic.khatabook.model.UnitOfMeasurement;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;

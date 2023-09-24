@@ -1,10 +1,9 @@
 package com.generic.khatabook.service.mapper;
 
-import com.generic.khatabook.common.model.Container;
-import com.generic.khatabook.common.model.Mapper;
+import com.generic.khatabook.common.model.*;
 import com.generic.khatabook.entity.Amount;
 import com.generic.khatabook.entity.CustomerPayment;
-import com.generic.khatabook.model.*;
+import lombok.val;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
-public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPaymentSummary, Void> {
+public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPaymentDTO, CustomerPaymentSummary> {
 
 
     public static Collection<CustomerPaymentSummary> mapToPojos(final Collection<CustomerPayment> customersPayment, SummaryProperties of, CustomerSpecificationDTO customerSpecification) {
@@ -84,30 +83,31 @@ public class CustomerPaymentMapper implements Mapper<CustomerPayment, CustomerPa
 
 
     @Override
-    public CustomerPayment mapToEntity(final CustomerPaymentSummary customerPaymentSummary) {
-        return CustomerPayment.builder().khatabookId(customerPaymentSummary.khatabookId())
-                .customerId(customerPaymentSummary.customerId())
-                .productId(customerPaymentSummary.productId())
-                .amount(Amount.of(customerPaymentSummary.amount().value(),
-                        customerPaymentSummary.amount().unitOfMeasurement())).paymentOnDate(
+    public CustomerPayment mapToEntity(final CustomerPaymentDTO customerPaymentSummary) {
+        return CustomerPayment.builder().khatabookId(customerPaymentSummary.getKhatabookId())
+                .customerId(customerPaymentSummary.getCustomerId())
+                .productId(customerPaymentSummary.getProductId())
+                .amount(Amount.of(customerPaymentSummary.getAmount().value(),
+                        customerPaymentSummary.getAmount().unitOfMeasurement())).paymentOnDate(
                         LocalDateTime.now(Clock.systemDefaultZone())).build();
     }
 
     @Override
-    public Container<CustomerPaymentSummary, Void> mapToContainer(final CustomerPayment customerPayment) {
+    public Container<CustomerPaymentDTO, CustomerPaymentSummary> mapToContainer(final CustomerPayment customerPayment) {
         return null;
     }
 
     @Override
-    public CustomerPaymentSummary mapToDTO(final CustomerPayment customerPayment) {
-        return new CustomerPaymentSummary(customerPayment.getKhatabookId(),
+    public CustomerPaymentDTO mapToDTO(final CustomerPayment customerPayment) {
+        final val amount = AmountDTO.of(customerPayment.getAmount().unitValue(),
+                customerPayment.getAmount().unitOfMeasurement(),
+                Currency.getInstance(customerPayment.getAmount().unitOfMeasurement()));
+        return new CustomerPaymentDTO(
+                customerPayment.getId(),
+                customerPayment.getKhatabookId(),
                 customerPayment.getCustomerId(),
-                PaymentType.valueOf(customerPayment.getPaymentType()),
-
-                AmountDTO.of(customerPayment.getAmount().unitValue(),
-                        customerPayment.getAmount().unitOfMeasurement(),
-                        Currency.getInstance(customerPayment.getAmount().unitOfMeasurement())),
-                customerPayment.getProductId(),
-                customerPayment.getPaymentOnDate());
+                customerPayment.getPaymentType(),
+                amount, customerPayment.getProductId(),
+                customerPayment.getPaymentOnDate(), customerPayment.getDescriptions());
     }
 }

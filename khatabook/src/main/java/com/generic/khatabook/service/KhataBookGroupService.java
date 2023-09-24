@@ -1,6 +1,6 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.KhatabookGroupDTO;
+import com.generic.khatabook.common.model.KhatabookGroupDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

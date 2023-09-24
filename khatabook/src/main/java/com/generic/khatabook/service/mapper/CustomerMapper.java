@@ -1,14 +1,14 @@
 package com.generic.khatabook.service.mapper;
 
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerUpdatable;
 import com.generic.khatabook.common.model.Mapper;
+import com.generic.khatabook.common.model.Product;
 import com.generic.khatabook.entity.Customer;
 import com.generic.khatabook.entity.CustomerProduct;
 import com.generic.khatabook.entity.CustomerSpecification;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerSpecificationDTO;
-import com.generic.khatabook.model.CustomerUpdatable;
-import com.generic.khatabook.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-
 @Component
 public class CustomerMapper implements Mapper<Customer, CustomerDTO, CustomerUpdatable> {
 

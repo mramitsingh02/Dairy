@@ -1,12 +1,11 @@
 package com.generic.khatabook.service.mapper;
 
+import com.generic.khatabook.common.model.AmountDTO;
 import com.generic.khatabook.entity.Amount;
 import com.generic.khatabook.exceptions.IncompatibleStateException;
-import com.generic.khatabook.model.AmountDTO;
-import com.generic.khatabook.exceptions.AppEntity;
+
 import java.util.Currency;
 import java.util.Locale;
-
 public class AmountMapper {
     public static Amount add(final Amount amount, final Amount amount1) {
         if (!amount.unitOfMeasurement().equals(amount1.unitOfMeasurement())) {

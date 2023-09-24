@@ -1,12 +1,11 @@
 package com.generic.khatabook.service.mapper;
 
+import com.generic.khatabook.common.model.AmountDTO;
 import com.generic.khatabook.entity.Amount;
-import com.generic.khatabook.model.AmountDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-
 class AmountMapperTest {
 
 

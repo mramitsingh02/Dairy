@@ -1,6 +1,6 @@
 package com.generic.khatabook.exchanger;
 
-import com.generic.khatabook.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;

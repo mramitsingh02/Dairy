@@ -1,9 +1,9 @@
 package com.generic.khatabook.controller;
 
 import com.generic.khatabook.common.exceptions.NoPaymentForAggregateException;
+import com.generic.khatabook.common.model.AggregatePaymentDTO;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.model.AggregatePaymentDTO;
 import com.generic.khatabook.service.AggregatePaymentService;
 import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.IdGeneratorService;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
-
 @RestController
 public class PaymentAggregationController {
 

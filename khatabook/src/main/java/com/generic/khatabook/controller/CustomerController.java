@@ -1,17 +1,17 @@
 package com.generic.khatabook.controller;
 
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerUpdatable;
+import com.generic.khatabook.common.model.KhatabookDetails;
+import com.generic.khatabook.common.model.KhatabookDetailsView;
+import com.generic.khatabook.common.model.KhatabookPaymentSummaryView;
+import com.generic.khatabook.common.model.PaymentDTO;
+import com.generic.khatabook.common.model.Product;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.InvalidArgumentException;
 import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerSpecificationDTO;
-import com.generic.khatabook.model.CustomerUpdatable;
-import com.generic.khatabook.model.KhatabookDetails;
-import com.generic.khatabook.model.KhatabookDetailsView;
-import com.generic.khatabook.model.KhatabookPaymentSummaryView;
-import com.generic.khatabook.model.PaymentDTO;
-import com.generic.khatabook.model.Product;
 import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.CustomerSpecificationService;
 import com.generic.khatabook.service.KhatabookService;

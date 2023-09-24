@@ -2,12 +2,11 @@ package com.generic.khatabook.service.mapper;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Mapper;
+import com.generic.khatabook.common.model.OperatorDTO;
 import com.generic.khatabook.entity.Operator;
-import com.generic.khatabook.model.OperatorDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-
 @Component
 public class OperatorMapper implements Mapper<Operator, OperatorDTO, Void> {
 

@@ -3,7 +3,7 @@ package com.generic.khatabook.service.impl;
 
 import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exchanger.ProductClient;
-import com.generic.khatabook.model.*;
+import com.generic.khatabook.common.model.*;
 import org.junit.Before;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

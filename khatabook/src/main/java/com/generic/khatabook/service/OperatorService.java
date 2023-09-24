@@ -1,10 +1,9 @@
 package com.generic.khatabook.service;
 
-import com.generic.khatabook.model.OperatorDTO;
+import com.generic.khatabook.common.model.OperatorDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
 @Component
 public interface OperatorService {
     boolean isValid(OperatorDTO customer);

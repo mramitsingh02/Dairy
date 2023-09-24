@@ -1,8 +1,8 @@
 package com.generic.khatabook.factory;
 
+import com.generic.khatabook.common.model.ProductDTO;
 import com.generic.khatabook.entity.CustomerProductSpecification;
 import com.generic.khatabook.entity.CustomerSpecification;
-import com.generic.khatabook.model.ProductDTO;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

@@ -1,11 +1,10 @@
 package com.generic.khatabook.service.impl;
 
-import com.generic.khatabook.entity.Amount;
+import com.generic.khatabook.common.model.*;
 import com.generic.khatabook.entity.CustomerPayment;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.InvalidArgumentValueException;
 import com.generic.khatabook.exchanger.ProductClient;
-import com.generic.khatabook.model.*;
 import com.generic.khatabook.service.mapper.AmountMapper;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +96,9 @@ public final class PaymentLogic {
 
         PaymentStatistics paymentStatistics = getPaymentStatistics(customerAllPaymentBetweenRange);
 
-        CustomerPayment customerPayment = new CustomerPayment(null, customerDTO.khatabookId(), customerDTO.customerId(), PaymentType.AGGRIGATED.name(), Amount.of(paymentStatistics.total().value(), paymentStatistics.total().unitOfMeasurement()), aggregatePaymentDTO.productId(), LocalDateTime.now(), "Aggregated");
+        CustomerPaymentDTO customerPayment = new CustomerPaymentDTO(null, customerDTO.khatabookId(),
+                customerDTO.customerId(), PaymentType.AGGRIGATED.name(), AmountDTO.of(paymentStatistics.total().value()
+                , paymentStatistics.total().unitOfMeasurement()), aggregatePaymentDTO.productId(), LocalDateTime.now(), "Aggregated");
 
         return new CustomerPaymentAggregatedDTO(new AggregatePaymentDTO(aggregatePaymentDTO.productId(), customerFirstPayment.getPaymentOnDate(), customerLastPayment.getPaymentOnDate()), customerPayment);
     }

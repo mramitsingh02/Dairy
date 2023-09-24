@@ -1,7 +1,11 @@
-com\generic\khatabook\common\exceptions\IncompatibleStateException.class
 com\generic\khatabook\common\exceptions\DuplicateFoundException.class
+com\generic\khatabook\common\exceptions\SubEntity.class
+com\generic\khatabook\common\exceptions\IllegalArgumentException.class
+com\generic\khatabook\common\exceptions\ResourceFoundException.class
 com\generic\khatabook\common\exceptions\NotFoundException.class
+com\generic\khatabook\common\exceptions\ErrorMessages.class
 com\generic\khatabook\common\exceptions\LimitBonusException.class
+com\generic\khatabook\common\exceptions\NoPaymentForAggregateException.class
 com\generic\khatabook\common\exceptions\LimitBonusException$Limit.class
 com\generic\khatabook\common\exceptions\AppEntity.class
 com\generic\khatabook\common\exceptions\InvalidArgumentException.class

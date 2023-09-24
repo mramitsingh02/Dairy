@@ -1,16 +1,18 @@
 package com.generic.khatabook.service.impl;
 
 import com.generic.khatabook.common.exceptions.NoPaymentForAggregateException;
+import com.generic.khatabook.common.model.AggregatePaymentDTO;
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerPaymentAggregatedDTO;
+import com.generic.khatabook.common.model.KhatabookDTO;
 import com.generic.khatabook.entity.AggregatePayment;
 import com.generic.khatabook.entity.CustomerPayment;
-import com.generic.khatabook.model.AggregatePaymentDTO;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerPaymentAggregatedDTO;
-import com.generic.khatabook.model.KhatabookDTO;
 import com.generic.khatabook.repository.AggregatePaymentRepository;
 import com.generic.khatabook.repository.PaymentRepository;
 import com.generic.khatabook.service.AggregatePaymentService;
 import com.generic.khatabook.service.mapper.AggregatePaymentMapper;
+import com.generic.khatabook.service.mapper.CustomerPaymentMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
@@ -20,23 +22,14 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AggregatePaymentServiceImpl implements AggregatePaymentService {
 
-    private final AggregatePaymentRepository myAggregatePaymentRepository;
-    private final AggregatePaymentMapper myAggregatePaymentMapper;
+    private final AggregatePaymentRepository aggregatePaymentRepository;
+    private final AggregatePaymentMapper aggregatePaymentMapper;
+    private final CustomerPaymentMapper customerPaymentMapper;
     private final PaymentRepository paymentRepository;
     private final PaymentLogic paymentLogic;
-
-    public AggregatePaymentServiceImpl(final AggregatePaymentRepository myAggregatePaymentRepository,
-                                       final AggregatePaymentMapper myAggregatePaymentMapper,
-                                       final PaymentRepository paymentRepository,
-                                       final PaymentLogic paymentLogic) {
-        this.myAggregatePaymentRepository = myAggregatePaymentRepository;
-        this.myAggregatePaymentMapper = myAggregatePaymentMapper;
-        this.paymentRepository = paymentRepository;
-        this.paymentLogic = paymentLogic;
-    }
-
 
     @Override
     public void paymentAggregate(final KhatabookDTO khatabook, final CustomerDTO customer, final AggregatePaymentDTO dto) {
@@ -65,8 +58,9 @@ public class AggregatePaymentServiceImpl implements AggregatePaymentService {
     private void aggregatePaymentForCustomerAndProducts(CustomerDTO customer, AggregatePaymentDTO dto, List<CustomerPayment> customerAllPaymentBetweenRange) {
         if (!customerAllPaymentBetweenRange.isEmpty()) {
             CustomerPaymentAggregatedDTO customerPaymentAggregatedDTO = paymentLogic.aggregatePayment(customer, dto, customerAllPaymentBetweenRange);
-            paymentRepository.save(customerPaymentAggregatedDTO.customerPayment());
-            myAggregatePaymentRepository.save(myAggregatePaymentMapper.mapToEntity(customerPaymentAggregatedDTO.aggregatePaymentDTO(), customer));
+            paymentRepository.save(customerPaymentMapper.mapToEntity(customerPaymentAggregatedDTO.customerPayment()));
+            aggregatePaymentRepository.save(aggregatePaymentMapper.mapToEntity(customerPaymentAggregatedDTO.aggregatePaymentDTO(),
+                    customer));
             paymentRepository.deleteAll(customerAllPaymentBetweenRange);
         } else {
             throw new NoPaymentForAggregateException("Product %s don't have any payment for aggregated.".formatted(dto.productId()));
@@ -89,10 +83,11 @@ public class AggregatePaymentServiceImpl implements AggregatePaymentService {
 
     @Override
     public AggregatePaymentDTO getLastAggregation(final KhatabookDTO khatabook, final CustomerDTO customer) {
-        final AggregatePayment entity = myAggregatePaymentRepository.findOne(Example.of(AggregatePayment.builder().khatabookId(khatabook.khatabookId())
-                .customerId(customer.customerId())
-                .build())).orElse(null);
-        assert entity!=null;
-        return myAggregatePaymentMapper.mapToDTO(entity);
+        final AggregatePayment entity =
+                aggregatePaymentRepository.findOne(Example.of(AggregatePayment.builder().khatabookId(khatabook.khatabookId())
+                        .customerId(customer.customerId())
+                        .build())).orElse(null);
+        assert entity != null;
+        return aggregatePaymentMapper.mapToDTO(entity);
     }
 }

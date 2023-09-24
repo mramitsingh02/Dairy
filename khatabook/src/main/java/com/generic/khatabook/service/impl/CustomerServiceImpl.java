@@ -1,16 +1,17 @@
 package com.generic.khatabook.service.impl;
 
 import com.generic.khatabook.common.model.Container;
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerUpdatable;
+import com.generic.khatabook.common.model.Product;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.UnitOfMeasurement;
 import com.generic.khatabook.entity.Customer;
 import com.generic.khatabook.entity.CustomerProduct;
 import com.generic.khatabook.entity.CustomerProductSpecification;
 import com.generic.khatabook.entity.CustomerSpecification;
 import com.generic.khatabook.exceptions.AppEntity;
 import com.generic.khatabook.exceptions.NotFoundException;
-import com.generic.khatabook.model.CustomerDTO;
-import com.generic.khatabook.model.CustomerUpdatable;
-import com.generic.khatabook.model.Product;
-import com.generic.khatabook.model.ProductDTO;
 import com.generic.khatabook.repository.CustomerRepository;
 import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.ProductService;
@@ -30,7 +31,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
@@ -40,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper myCustomerMapper;
 
     //Observability is the ability to measure the internal state of a system only by its external outputs
-    //https://www.baeldung.com/spring-boot-3-observability
+    //https://www.baeldung.com/spring-boot-3-observabilitye
 //    private final ObservationRegistry myRegistry;
 
 
@@ -57,7 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Container<CustomerDTO, CustomerUpdatable> getByCustomerId(final String customerId) {
-        Customer customer = myCustomerRepository.findById(customerId).orElse(null);
+        Customer customer = myCustomerRepository.findById(customerId).orElse(Customer.builder().build());
         for (CustomerProduct customerProduct : customer.getProducts()) {
             ProductDTO product = myProductService.getCustomerProduct(Product.of(customerProduct.getProductId()));
             customerProduct.setProductName(product.name());
@@ -88,12 +88,20 @@ public class CustomerServiceImpl implements CustomerService {
         if (customerDTO.products()!=null) {
             List<CustomerProduct> list = new ArrayList<>();
             for (ProductDTO x : products) {
+                populateProductLastReading(x);
                 list.add(ProductMapper.mapToProduct(x, customerEntity));
             }
             customerEntity.setProducts(list);
         }
         setDefaultCustomerSpecification(customerEntity, products);
         return myCustomerMapper.mapToDTO(myCustomerRepository.save(customerEntity));
+    }
+
+    private ProductDTO populateProductLastReading(final ProductDTO x) {
+        if (x.unitOfMeasurement().equals(UnitOfMeasurement.READING)) {
+//            myProductService.find
+        }
+        return x;
     }
 
     @Override

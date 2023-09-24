@@ -1,9 +1,17 @@
 package com.generic.khatabook.controller;
 
-import com.generic.khatabook.common.exceptions.*;
+import com.generic.khatabook.common.exceptions.AppEntity;
+import com.generic.khatabook.common.exceptions.DuplicateFoundException;
+import com.generic.khatabook.common.exceptions.InvalidArgumentException;
+import com.generic.khatabook.common.exceptions.NotFoundException;
+import com.generic.khatabook.common.exceptions.ResourceFoundException;
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Containers;
-import com.generic.khatabook.model.*;
+import com.generic.khatabook.common.model.CustomerDTO;
+import com.generic.khatabook.common.model.CustomerProductSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerProductSpecificationUpdatable;
+import com.generic.khatabook.common.model.CustomerSpecificationDTO;
+import com.generic.khatabook.common.model.CustomerSpecificationUpdatable;
 import com.generic.khatabook.service.CustomerService;
 import com.generic.khatabook.service.CustomerSpecificationService;
 import com.generic.khatabook.service.IdGeneratorService;
@@ -11,14 +19,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;

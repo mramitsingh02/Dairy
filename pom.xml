@@ -17,6 +17,7 @@
 		<module>Specification</module>
 		<module>Liquidbook</module>
 		<module>khatabook</module>
+		<module>review-service</module>
 	</modules>
 	
 
