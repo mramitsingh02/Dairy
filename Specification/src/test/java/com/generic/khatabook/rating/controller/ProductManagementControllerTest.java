@@ -3,10 +3,11 @@ package com.generic.khatabook.rating.controller;
 import com.generic.khatabook.common.exceptions.AppEntity;
 import com.generic.khatabook.common.exceptions.SubEntity;
 import com.generic.khatabook.common.model.Container;
-import com.generic.khatabook.rating.model.ProductDTO;
-import com.generic.khatabook.rating.model.ProductRatingDTO;
-import com.generic.khatabook.rating.model.ProductUpdatable;
-import com.generic.khatabook.rating.model.UnitOfMeasurement;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.ProductRatingDTO;
+import com.generic.khatabook.common.model.ProductUpdatable;
+import com.generic.khatabook.common.model.RatingDTO;
+import com.generic.khatabook.common.model.UnitOfMeasurement;
 import com.generic.khatabook.rating.services.ProductManagementService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @AutoConfigureJsonTesters
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -142,8 +142,8 @@ class ProductManagementControllerTest extends AbstractTest {
     void testRatingExistingProduct() throws Exception {
         String prodId = "1";
         String path = "/product/%s/rating".formatted(prodId);
-        ProductRatingDTO productRatingDTO =
-                new ProductRatingDTO(null, prodId, prodId, 4.0f, "Good milk product.");
+        RatingDTO productRatingDTO =
+                new RatingDTO(null, prodId, prodId, 4.0f, "Good milk product.");
 
         Container<ProductDTO, ProductUpdatable> prods = getProductDTOS().stream().filter(x -> x.id().equals(prodId)).map(x -> new Container(x, x.updatable())).findFirst().orElse(null);
         when(myProductManagementService.findProductById(prodId)).thenReturn(prods);

@@ -2,16 +2,15 @@ package com.generic.khatabook.rating.services.mapper;
 
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Mapper;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.ProductUpdatable;
+import com.generic.khatabook.common.model.UnitOfMeasurement;
 import com.generic.khatabook.rating.entity.Product;
-import com.generic.khatabook.rating.model.ProductDTO;
-import com.generic.khatabook.rating.model.ProductUpdatable;
-import com.generic.khatabook.rating.model.UnitOfMeasurement;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 @Component
 public class ProductMapper implements Mapper<Product, ProductDTO, ProductUpdatable> {
     public Product mapToEntity(ProductDTO dto) {

@@ -3,9 +3,8 @@ package com.generic.khatabook.rating.services.mapper;
 import com.generic.khatabook.common.model.Container;
 import com.generic.khatabook.common.model.Mapper;
 import com.generic.khatabook.rating.entity.Specification;
-import com.generic.khatabook.rating.model.SpecificationDTO;
 import org.springframework.stereotype.Component;
-
+import com.generic.khatabook.common.model.*;
 @Component
 public class SpecificationMapper implements Mapper<Specification, SpecificationDTO, Void> {
     @Override

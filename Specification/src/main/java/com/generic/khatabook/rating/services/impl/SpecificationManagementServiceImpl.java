@@ -1,6 +1,5 @@
 package com.generic.khatabook.rating.services.impl;
 
-import com.generic.khatabook.rating.model.SpecificationDTO;
 import com.generic.khatabook.rating.repository.SpecificationManagementRepository;
 import com.generic.khatabook.rating.services.SpecificationManagementService;
 import com.generic.khatabook.rating.services.mapper.SpecificationMapper;
@@ -8,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+import com.generic.khatabook.common.model.*;
 @Service
 public class SpecificationManagementServiceImpl implements SpecificationManagementService {
 

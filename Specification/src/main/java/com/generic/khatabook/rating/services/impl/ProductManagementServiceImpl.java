@@ -4,41 +4,29 @@ import com.generic.khatabook.common.exceptions.AppEntity;
 import com.generic.khatabook.common.exceptions.IllegalArgumentException;
 import com.generic.khatabook.common.exceptions.SubEntity;
 import com.generic.khatabook.common.model.Container;
-import com.generic.khatabook.rating.model.ProductDTO;
-import com.generic.khatabook.rating.model.ProductRatingDTO;
-import com.generic.khatabook.rating.model.ProductUpdatable;
-import com.generic.khatabook.rating.model.UnitOfMeasurement;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.ProductUpdatable;
+import com.generic.khatabook.common.model.RatingDTO;
+import com.generic.khatabook.common.model.UnitOfMeasurement;
 import com.generic.khatabook.rating.repository.ProductManagementRepository;
 import com.generic.khatabook.rating.repository.ProductRatingRepository;
 import com.generic.khatabook.rating.services.ProductManagementService;
 import com.generic.khatabook.rating.services.mapper.ProductMapper;
 import com.generic.khatabook.rating.services.mapper.ProductRatingMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductManagementServiceImpl implements ProductManagementService {
 
-    private ProductManagementRepository myProductManagementRepository;
-    private ProductRatingRepository myProductRatingRepository;
-    private ProductMapper myProductMapper;
-    private ProductRatingMapper myProductRatingMapper;
-
-    @Autowired
-    public ProductManagementServiceImpl(final ProductManagementRepository thatProductManagementRepository,
-                                        final ProductMapper thatProductMapper,
-                                        final ProductRatingRepository thatProductRatingRepository,
-                                        final ProductRatingMapper thatProductRatingMapper)
-    {
-        this.myProductManagementRepository = thatProductManagementRepository;
-        this.myProductRatingRepository = thatProductRatingRepository;
-        this.myProductMapper = thatProductMapper;
-        this.myProductRatingMapper = thatProductRatingMapper;
-    }
+    private final ProductManagementRepository myProductManagementRepository;
+    private final ProductRatingRepository myProductRatingRepository;
+    private final ProductMapper myProductMapper;
+    private final ProductRatingMapper myProductRatingMapper;
 
 
     @Override
@@ -73,21 +61,21 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     @Override
-    public void saveProductRating(final ProductRatingDTO productRatingDTO) {
-        log.info(productRatingDTO + " saving.");
+    public void saveProductRating(final RatingDTO ratingDTO) {
+        log.info(ratingDTO + " saving.");
 
-        myProductRatingRepository.save(myProductRatingMapper.mapToEntity(productRatingDTO));
+        myProductRatingRepository.save(myProductRatingMapper.mapToEntity(ratingDTO));
 
-        log.info(productRatingDTO + " saved.");
+        log.info(ratingDTO + " saved.");
     }
 
     @Override
-    public List<ProductRatingDTO> findProductRatingByProductId(final String productId) {
+    public List<RatingDTO> findProductRatingByProductId(final String productId) {
         return myProductRatingMapper.mapToDTOs(myProductRatingRepository.findByProductId(productId));
     }
 
     @Override
-    public List<ProductRatingDTO> findProductRatingByCustomerId(final String customerId) {
+    public List<RatingDTO> findProductRatingByCustomerId(final String customerId) {
         return myProductRatingMapper.mapToDTOs(myProductRatingRepository.findByCustomerId(customerId));
     }
 

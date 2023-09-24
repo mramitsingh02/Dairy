@@ -2,7 +2,6 @@ package com.generic.khatabook.rating.controller;
 
 import com.generic.khatabook.common.exceptions.AppEntity;
 import com.generic.khatabook.common.exceptions.NotFoundException;
-import com.generic.khatabook.rating.model.SpecificationDTO;
 import com.generic.khatabook.rating.services.SpecificationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import static java.util.Objects.isNull;
-
+import com.generic.khatabook.common.model.*;
 @RestController("specification")
 public class SpecificationManagementController {
 

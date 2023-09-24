@@ -7,12 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="specification" />
         <module name="khatabook" />
         <module name="liquidbook" />
+        <module name="discovery-server" />
         <module name="common" />
         <module name="errorframework" />
         <module name="review-service" />
+        <module name="specification" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -24,6 +25,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="common" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
       <module name="errorframework" options="-parameters" />
       <module name="errorframework (1)" options="-parameters" />
       <module name="khatabook" options="-parameters" />

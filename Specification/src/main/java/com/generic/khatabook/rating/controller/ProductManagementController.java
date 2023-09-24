@@ -3,16 +3,13 @@ package com.generic.khatabook.rating.controller;
 import com.generic.khatabook.common.exceptions.AppEntity;
 import com.generic.khatabook.common.exceptions.IllegalArgumentException;
 import com.generic.khatabook.common.exceptions.InvalidArgumentException;
-import com.generic.khatabook.common.exceptions.LimitBonusException;
 import com.generic.khatabook.common.exceptions.NotFoundException;
-import com.generic.khatabook.rating.model.ProductDTO;
-import com.generic.khatabook.rating.model.ProductRatingDTO;
-import com.generic.khatabook.rating.model.ProductRatingViews;
-import com.generic.khatabook.rating.model.ProductUpdatable;
-import com.generic.khatabook.rating.model.ProductViews;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.ProductUpdatable;
+import com.generic.khatabook.common.model.ProductViews;
 import com.generic.khatabook.rating.services.IdGeneratorService;
 import com.generic.khatabook.rating.services.ProductManagementService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -25,47 +22,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 @RestController
 @RequestMapping("product-service")
+@RequiredArgsConstructor
 public class ProductManagementController {
+    private final  ProductManagementService myProductManagementService;
+    private  final IdGeneratorService myIdGeneratorService;
 
-    private ProductManagementService myProductManagementService;
-
-    private IdGeneratorService myIdGeneratorService;
-
-    @Autowired
-    public ProductManagementController(final ProductManagementService productManagementService, final IdGeneratorService idGeneratorService) {
-        this.myProductManagementService = productManagementService;
-        this.myIdGeneratorService = idGeneratorService;
-    }
-
-    @PostMapping("/product/{productId}/rating")
-    public ResponseEntity<?> saveProductRating(@PathVariable String productId,
-                                               @RequestBody ProductRatingDTO productRatingDTO)
-    {
-        final ProductDTO product = myProductManagementService.findProductById(productRatingDTO.productId()).get();
-        if (Objects.isNull(product)) {
-            return ResponseEntity.of(new NotFoundException(AppEntity.PRODUCT, productRatingDTO.productId()).get()).build();
-        }
-        if (productRatingDTO.rating() > 5) {
-            return ResponseEntity.of(new LimitBonusException(AppEntity.PRODUCT, LimitBonusException.Limit.MAX, productRatingDTO.rating()).get()).build();
-        } else if (productRatingDTO.rating() < 0) {
-            return ResponseEntity.of(new LimitBonusException(AppEntity.PRODUCT, LimitBonusException.Limit.MIN, productRatingDTO.rating()).get()).build();
-        }
-        myProductManagementService.saveProductRating(productRatingDTO.copyOf(myIdGeneratorService.generateId()));
-        return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest().path("/{productId}").buildAndExpand(product.id()).toUri()).body(productRatingDTO);
-    }
-
-    @GetMapping("/product/{productId}/rating")
-    public ResponseEntity<?> getProductRating(@PathVariable String productId) {
-        final List<ProductRatingDTO> productRatings =
-                myProductManagementService.findProductRatingByProductId(productId);
-        if (Objects.isNull(productRatings) || productRatings.isEmpty()) {
-            return ResponseEntity.ok(new ProductRatingViews(productId));
-        }
-        return ResponseEntity.ok(new ProductRatingViews(productRatings));
-    }
 
     @PostMapping(path = "/products")
     public ResponseEntity<?> createAll(@RequestBody List<ProductDTO> products) {

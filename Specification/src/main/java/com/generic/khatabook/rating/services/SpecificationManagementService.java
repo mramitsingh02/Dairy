@@ -1,10 +1,9 @@
 package com.generic.khatabook.rating.services;
 
 
-import com.generic.khatabook.rating.model.SpecificationDTO;
+import com.generic.khatabook.common.model.SpecificationDTO;
 
 import java.util.List;
-
 public interface SpecificationManagementService {
     SpecificationDTO addSpecification(SpecificationDTO specification);
 

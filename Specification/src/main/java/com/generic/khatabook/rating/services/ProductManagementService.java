@@ -1,12 +1,11 @@
 package com.generic.khatabook.rating.services;
 
 import com.generic.khatabook.common.model.Container;
-import com.generic.khatabook.rating.model.ProductDTO;
-import com.generic.khatabook.rating.model.ProductRatingDTO;
-import com.generic.khatabook.rating.model.ProductUpdatable;
+import com.generic.khatabook.common.model.ProductDTO;
+import com.generic.khatabook.common.model.ProductUpdatable;
+import com.generic.khatabook.common.model.RatingDTO;
 
 import java.util.List;
-
 public interface ProductManagementService {
 
     List<ProductDTO> findAllProducts();
@@ -21,11 +20,11 @@ public interface ProductManagementService {
 
     ProductDTO updateProduct(ProductDTO entityModel);
 
-    void saveProductRating(ProductRatingDTO productRatingDTO);
+    void saveProductRating(RatingDTO ratingDTO);
 
-    List<ProductRatingDTO> findProductRatingByProductId(String productId);
+    List<RatingDTO> findProductRatingByProductId(String productId);
 
-    List<ProductRatingDTO> findProductRatingByCustomerId(String customerId);
+    List<RatingDTO> findProductRatingByCustomerId(String customerId);
 
     List<ProductDTO> findProductByUnitOfMeasurement(String unitOfMeasurement);
 }
